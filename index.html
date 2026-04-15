@@ -379,6 +379,40 @@ function showDetail(idx){
   const boleto=bMap[idx]||'';const msg=r.msg(c,boleto);
   const alrt=c.dm>=65?`<div class="dalert">⚠️ Encaminhar para advogado imediatamente — débito há mais de 65 dias.</div>`
     :c.dm>=35?`<div class="dalert" style="color:var(--purple);border-color:#4a1d95;background:#0f0818">⚠️ Protesto em cartório — executar urgentemente.</div>`:'';
+  const suspCheckList = (c.dm >= 10) ? `
+    <div style="background:var(--red-bg);border:1px solid var(--red2);border-radius:var(--r);padding:16px;margin-top:14px">
+      <div class="dbt" style="color:var(--red);margin-bottom:12px">🔴 CHECKLIST DE SUSPENSÃO — ZappyContábil + Acessórias</div>
+      <div style="display:flex;flex-direction:column;gap:7px" id="sus-chk-${idx}">
+        ${['① ZappyContábil → adicionar tag <b>SUSPENSO</b>',
+           '② ZappyContábil → renomear para: <b>(SUSPENSO) '+c.nome+'</b>',
+           '③ Acessórias → <b>INATIVAR</b> acesso do cliente',
+           '④ Painel de clientes suspensos → <b>INCLUIR</b> o cliente',
+           '⑤ WhatsApp de suspensão enviado',
+           '⑥ Data/hora da suspensão registrada no sistema',
+           '⑦ CEO informado'].map((item,ii)=>`
+          <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="tgSusChk(this)">
+            <div style="min-width:18px;height:18px;border:2px solid var(--red2);border-radius:4px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0;transition:all .15s" class="sus-box"></div>
+            <span style="font-size:13px;color:var(--text2);line-height:1.4">${item}</span>
+          </div>`).join('')}
+      </div>
+    </div>
+    <div style="background:var(--green-bg);border:1px solid #0a4a28;border-radius:var(--r);padding:16px;margin-top:10px">
+      <div class="dbt" style="color:var(--green);margin-bottom:12px">✅ CHECKLIST DE REATIVAÇÃO — após pagamento confirmado</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${['① Confirmar pagamento integral ou acordo formalizado',
+           '② ZappyContábil → <b>REMOVER</b> tag SUSPENSO',
+           '③ ZappyContábil → restaurar nome original: <b>'+c.nome+'</b>',
+           '④ Acessórias → <b>REATIVAR</b> acesso do cliente',
+           '⑤ Painel de clientes suspensos → <b>REMOVER</b> o cliente',
+           '⑥ Data/hora da reativação registrada no sistema',
+           '⑦ Orientar cliente sobre declarações em atraso e multas do período'].map((item)=>`
+          <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="tgSusChk(this)">
+            <div style="min-width:18px;height:18px;border:2px solid #0a4a28;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0;transition:all .15s" class="sus-box-g"></div>
+            <span style="font-size:13px;color:var(--text2);line-height:1.4">${item}</span>
+          </div>`).join('')}
+      </div>
+    </div>` : '';
+
   document.getElementById('dpanel').innerHTML=`
     <div class="dp">
       <div class="dp-top">
@@ -393,6 +427,7 @@ function showDetail(idx){
           <div class="dbt">O que fazer agora</div><div class="dba" style="margin-bottom:14px">${r.acao}</div>
           <div class="dbt">Parcelas em aberto</div>
           <div>${(c.parcelas||[]).map(p=>`<div class="parc-row"><span>${p.venc||'—'}</span><span style="color:${(p.dias||c.dm)>=35?'var(--red)':(p.dias||c.dm)>=20?'var(--amber)':'var(--text2)'}">R$ ${fmt(p.valor)} · D+${p.dias||c.dm}</span></div>`).join('')}</div>
+          ${suspCheckList}
         </div>
         <div class="dp-box">
           <div class="dbt">Script de cobrança — WhatsApp</div>
@@ -418,6 +453,22 @@ function cpMsg(idx){
   navigator.clipboard.writeText(el.textContent).then(()=>{
     const btn=el.nextElementSibling;btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='Copiar mensagem',2000);
   });
+}
+function tgSusChk(el){
+  const box=el.querySelector('.sus-box,.sus-box-g');
+  const txt=el.querySelector('span');
+  const done=el.dataset.done==='1';
+  if(done){
+    el.dataset.done='0';
+    box.style.background='';box.style.borderColor=box.classList.contains('sus-box')?'var(--red2)':'#0a4a28';
+    box.innerHTML='';txt.style.textDecoration='';txt.style.color='var(--text2)';
+  } else {
+    el.dataset.done='1';
+    box.style.background=box.classList.contains('sus-box')?'var(--red)':'var(--green)';
+    box.style.borderColor=box.classList.contains('sus-box')?'var(--red)':'var(--green)';
+    box.innerHTML='<span style="color:#fff;font-size:11px;font-weight:700">✓</span>';
+    txt.style.textDecoration='line-through';txt.style.color='var(--text3)';
+  }
 }
 function exportCSV(){
   const rows=getFiltered();
@@ -449,16 +500,78 @@ const CAD=[
    s:`[NOME], 2 dias para a suspensão. Última ligação antes de tomarmos medidas. Tem condição de pagar hoje?\n\n[Se aceitar → enviar link do boleto pelo WhatsApp]`},
   {dia:'D+9',tipo:'9º Contato — ÚLTIMO DIA',canal:'WhatsApp + Ligação',cor:'#991b1b',bg:'#160303',acao:'WhatsApp + LIGAR. Duplo contato obrigatório. Registrar horário.',
    s:`[NOME], AMANHÃ seus serviços serão suspensos (R$ [VALOR]). Última oportunidade.\n\n💰 Pague agora e evite a suspensão: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+10',tipo:'🔴 SUSPENSÃO TOTAL',canal:'WhatsApp + Equipe Interna',cor:'#fff',bg:'#7f1d1d',acao:'EXECUTAR: bloquear portal, entregas e acesso. Notificar equipe. INFORMAR CEO.',
-   s:`[NOME], comunicamos a SUSPENSÃO IMEDIATA de todos os serviços contábeis em razão do débito de R$ [VALOR] sem posição por 10 dias.\n\n💰 Para reativar, quite agora: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+11',tipo:'Pós-Suspensão — Dia 1',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'Reforçar que empresa está sem cobertura contábil. Registrar.',
-   s:`[NOME], serviços SUSPENSOS. Empresa sem cobertura — multas fiscais automáticas. Regularize agora.\n\n💰 Quite agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+12',tipo:'Pós-Suspensão — Dia 2',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Mencionar obrigações acessórias próximas.',
-   s:`[NOME], serviços suspensos há 2 dias. DAS, DCTF e obrigações não serão entregues — multas automáticas. Vamos resolver hoje?\n\n[Se aceitar → enviar link pelo WhatsApp]`},
-  {dia:'D+13',tipo:'Pós-Suspensão — Dia 3',canal:'WhatsApp + Ligação',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp + LIGAR. Mencionar multas fiscais específicas.',
-   s:`[NOME], além do débito de R$ [VALOR], sua empresa acumula multas fiscais. Regularize agora.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+10',tipo:'🔴 SUSPENSÃO TOTAL',canal:'WhatsApp + Equipe Interna',cor:'#fff',bg:'#7f1d1d',
+   acao:`EXECUTAR AGORA — CHECKLIST OBRIGATÓRIO:
+① ZappyContábil → adicionar tag SUSPENSO ao cliente
+② ZappyContábil → renomear para: (SUSPENSO) [NOME DO CLIENTE]
+③ Acessórias → INATIVAR acesso do cliente
+④ Painel de clientes suspensos → INCLUIR o cliente
+⑤ Enviar WhatsApp de suspensão (script abaixo)
+⑥ Registrar data/hora da suspensão no sistema
+⑦ INFORMAR CEO imediatamente`,
+   s:`Prezado(a) [NOME], comunicamos o BLOQUEIO IMEDIATO de todos os serviços contábeis em razão do débito de R$ [VALOR] em aberto há 10 dias sem nenhuma posição de pagamento ou negociação.
+
+⛔ A partir de hoje NÃO serão entregues:
+• Declarações fiscais (DAS, DCTF, SPED, ECF, ECD)
+• Obrigações acessórias de qualquer natureza
+• Relatórios, balancetes e demonstrativos
+• Guias de pagamento e certidões
+
+⚠️ IMPORTANTE: todas as multas e juros decorrentes do não envio das declarações fiscais são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA, conforme contrato.
+
+A retomada dos serviços ocorrerá SOMENTE após quitação integral do débito ou acordo formalizado por escrito.
+
+💰 Quite agora e evite as multas fiscais: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'✅ REATIVAÇÃO',tipo:'Procedimento de Reativação',canal:'Interno — após pagamento confirmado',cor:'#10b981',bg:'#08201a',
+   acao:`CHECKLIST DE REATIVAÇÃO — executar após confirmação do pagamento:
+① Confirmar pagamento integral ou acordo formalizado
+② ZappyContábil → REMOVER tag SUSPENSO do cliente
+③ ZappyContábil → RESTAURAR nome original (retirar "(SUSPENSO)")
+④ Acessórias → REATIVAR acesso do cliente
+⑤ Painel de clientes suspensos → REMOVER o cliente
+⑥ Registrar data/hora da reativação no sistema
+⑦ Verificar declarações em atraso durante o período suspenso — orientar cliente sobre multas pendentes
+⑧ Comunicar equipe técnica para retomar os serviços`,
+   s:`Olá [NOME], seu pagamento foi confirmado e seus serviços contábeis foram REATIVADOS a partir de hoje.
+
+✅ Seu acesso ao portal Acessórias foi restaurado.
+
+⚠️ Atenção: durante o período de suspensão, as declarações fiscais não foram entregues. Nossa equipe entrará em contato para orientá-lo(a) sobre as providências necessárias em relação às obrigações do período.
+
+Qualquer dúvida, estamos à disposição. Agradecemos a regularização!`},
+  {dia:'D+11',tipo:'Pós-Suspensão — Dia 1',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'Reforçar que empresa está sem cobertura contábil E que multas são responsabilidade do cliente. Registrar.',
+   s:`[NOME], seus serviços contábeis estão SUSPENSOS desde ontem por falta de pagamento (R$ [VALOR]).
+
+⛔ Declarações fiscais (DAS, DCTF, SPED e demais obrigações) NÃO estão sendo entregues.
+
+⚠️ Todas as multas e juros gerados pela não entrega são de sua responsabilidade, conforme contrato.
+
+Regularize agora e evite um problema ainda maior.
+
+💰 Quite agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+12',tipo:'Pós-Suspensão — Dia 2',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Mencionar obrigações que vencem esta semana. Lembrar que multas são responsabilidade deles.',
+   s:`[NOME], serviços suspensos há 2 dias. Neste período, as seguintes obrigações NÃO estão sendo entregues pelo escritório: DAS, DCTF, SPED e demais acessórias.
+
+⚠️ As multas e juros por não entrega dessas declarações são de sua exclusiva responsabilidade. Isso pode gerar autuação fiscal imediata.
+
+Vamos resolver hoje?
+
+[Se aceitar → enviar link do boleto pelo WhatsApp imediatamente]`},
+  {dia:'D+13',tipo:'Pós-Suspensão — Dia 3',canal:'WhatsApp + Ligação',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp + LIGAR. Citar obrigação fiscal específica que está próxima. Registrar.',
+   s:`[NOME], 3 dias suspenso. Sua empresa está acumulando risco fiscal a cada dia:
+
+⛔ Declarações não entregues: DAS, DCTF e demais obrigações
+⚠️ Multas por atraso: responsabilidade da empresa, não do escritório
+
+O débito de R$ [VALOR] cresce com multa e juros. Regularize agora.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
   {dia:'D+14',tipo:'Pós-Suspensão — Dia 4',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Tentar pagamento parcial. Qualquer acordo por escrito.',
-   s:`[NOME], 14 dias em aberto, 4 suspenso. Tem condição de pagar ao menos parte hoje?\n\n[Se aceitar → enviar link pelo WhatsApp imediatamente]`},
+   s:`[NOME], 14 dias de débito em aberto e 4 dias sem cobertura contábil. Sua empresa está exposta a multas fiscais crescentes que são de sua responsabilidade.
+
+Tem condição de pagar ao menos parte hoje para iniciarmos a reativação?
+
+[Se aceitar → enviar link do boleto pelo WhatsApp imediatamente]`},
   {dia:'D+15',tipo:'Pós-Suspensão — Dia 5',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'Alerta de escalada iminente. Última chance de acordo favorável.',
    s:`[NOME], 15 dias em aberto. Próximos de medidas legais. Ainda posso negociar.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
   {dia:'D+16',tipo:'Pós-Suspensão — Dia 6',canal:'WhatsApp + Ligação',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp + LIGAR após. Registrar com horário.',
@@ -479,19 +592,17 @@ const CAD=[
 
 function renderCadencia(){
   document.getElementById('cadlist').innerHTML=CAD.map((c,i)=>`
-    <div class="ci">
-      <div class="ch" onclick="tgC(${i})">
-        <div class="dia-b" style="background:${c.bg};color:${c.cor};border:1px solid ${c.cor}40">
-          <span style="font-size:9px;opacity:.8">DIA</span><span style="font-size:14px">${c.dia}</span>
-        </div>
+    <div class="ci" style="${c.dia==='✅ REATIVAÇÃO'?'border-color:#0a4a28':''}">
+      <div class="ch" onclick="tgC(${i})" style="${c.dia==='✅ REATIVAÇÃO'?'background:var(--green-bg)':''}">
+        <div class="dia-b" style="background:${c.bg};color:${c.cor};border:1px solid ${c.cor}40;${c.dia==='✅ REATIVAÇÃO'?'font-size:20px;':''}">${c.dia==='✅ REATIVAÇÃO'?'✅':`<span style="font-size:9px;opacity:.8">DIA</span><span style="font-size:14px">${c.dia}</span>`}</div>
         <div class="ci-info"><div class="ci-tipo" style="color:${c.cor}">${c.tipo}</div><div class="ci-canal">📲 ${c.canal}</div></div>
         <div class="chev" id="cv${i}">▼</div>
       </div>
       <div class="cb" id="cb${i}">
         <div class="slbl">💬 Script / Mensagem</div>
-        <div class="stxt">${c.s}</div>
-        <div class="slbl">✅ Ação obrigatória</div>
-        <div class="abox" style="color:${c.cor};border-color:${c.cor}40;background:${c.bg}">${c.acao}</div>
+        <div class="stxt" style="border-color:${c.cor}60;white-space:pre-wrap">${c.s}</div>
+        <div class="slbl">✅ Ação obrigatória${c.dia==='D+10'||c.dia==='✅ REATIVAÇÃO'?' — CHECKLIST SISTEMA':''}</div>
+        <div class="abox" style="color:${c.cor};border-color:${c.cor}40;background:${c.bg};white-space:pre-wrap;line-height:1.9">${c.acao}</div>
       </div>
     </div>`).join('');
 }
