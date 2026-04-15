@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub de Cobrança</title>
+<style>
+:root{--bg:#0a0a0f;--bg2:#0f0f18;--bg3:#141420;--border:#1e1e2e;--border2:#2a2a3e;--text:#e8e0d0;--text2:#a09080;--text3:#605060;--red:#dc2626;--red2:#991b1b;--red-bg:#1a0808;--amber:#f59e0b;--green:#10b981;--green-bg:#081a10;--purple:#8b5cf6;--white:#fff;--r:6px;--rl:10px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;min-height:100vh}
+nav{background:#070710;border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;position:sticky;top:0;z-index:100}
+.brand{font-size:13px;font-weight:700;color:var(--red);letter-spacing:2px;text-transform:uppercase;padding:14px 0;margin-right:24px;white-space:nowrap}
+.tabs{display:flex;overflow-x:auto}
+.tab{padding:16px 15px;font-size:13px;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;user-select:none}
+.tab:hover{color:var(--text2)}.tab.on{color:var(--text);border-bottom-color:var(--red)}
+.page{display:none;padding:28px 24px;max-width:1100px;margin:0 auto}.page.on{display:block}
+.ph{margin-bottom:22px}.pt{font-size:22px;font-weight:700;color:var(--white);margin-bottom:4px}.ps{font-size:13px;color:var(--text2)}
+.krow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:16px 18px}
+.kl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px}
+.kv{font-size:26px;font-weight:700;line-height:1}.kv.red{color:var(--red)}.kv.amb{color:var(--amber)}.kv.grn{color:var(--green)}
+.uzone{border:2px dashed var(--border2);border-radius:var(--rl);padding:40px;text-align:center;cursor:pointer;transition:all .2s;margin-bottom:22px}
+.uzone:hover,.uzone.drag{border-color:var(--red);background:var(--red-bg)}
+.uicon{font-size:36px;margin-bottom:12px}.utitle{font-size:16px;font-weight:600;color:var(--white);margin-bottom:6px}.usub{font-size:13px;color:var(--text2)}
+.usub a{color:var(--red);cursor:pointer;text-decoration:underline}
+.frow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.frow input,.frow select{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:13px;padding:7px 12px;outline:none}
+.frow input{flex:1;min-width:180px}.frow input:focus,.frow select:focus{border-color:var(--red)}.frow select option{background:var(--bg2)}
+.btn{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:13px;padding:7px 14px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.btn:hover{border-color:var(--text3);background:var(--bg3)}.btnr{background:var(--red-bg);border-color:var(--red2);color:var(--red)}.btnr:hover{background:var(--red);color:var(--white)}
+.tw{border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:18px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th{background:var(--bg3);font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:9px 13px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:9px 13px;border-bottom:1px solid var(--border);color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+tr:last-child td{border-bottom:none}.clk{cursor:pointer}.clk:hover td{background:var(--bg3)}.sel td{background:#1a0808}
+.bdg{display:inline-block;font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap}
+.low{background:#2a1800;color:#fbbf24}.mid{background:#2a0f00;color:#fb923c}.sus{background:#120a20;color:#a78bfa}.prot{background:#1a0a1a;color:#e879f9}.crit{background:#0a0a0a;color:#94a3b8;border:1px solid #334155}
+.dp{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--rl);padding:22px;margin-bottom:18px}
+.dp-top{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.dp-name{font-size:17px;font-weight:700;color:var(--white)}.dp-meta{font-size:13px;color:var(--text2);margin-top:4px}
+.dp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dp-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px}
+.dbt{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:9px}
+.dba{font-size:13px;color:var(--text);line-height:1.6}
+.dalert{background:var(--red-bg);border:1px solid var(--red2);border-radius:var(--r);padding:9px 13px;font-size:13px;color:var(--red);margin-bottom:13px;font-weight:600}
+.smsg{font-size:13px;color:var(--text2);line-height:1.8;font-style:italic;background:var(--bg);border-left:3px solid var(--red);padding:12px 15px;border-radius:0 var(--r) var(--r) 0;white-space:pre-wrap;word-break:break-word;margin-top:8px}
+.brow{display:flex;gap:8px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.brow label{font-size:11px;color:var(--amber);white-space:nowrap;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+.brow input{flex:1;min-width:200px;background:var(--bg2);border:1px solid #854F0B;border-radius:var(--r);color:var(--text);font-size:13px;padding:7px 10px;outline:none}
+.brow input:focus{border-color:var(--amber)}.brow input::placeholder{color:var(--text3)}
+.cp-btn{font-size:12px;padding:5px 12px;margin-top:9px}
+.parc-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);padding:4px 0;border-bottom:.5px solid var(--border)}
+.parc-row:last-child{border:none}
+.ci{border:1px solid var(--border);border-radius:var(--r);margin-bottom:8px;overflow:hidden}
+.ch{display:flex;align-items:center;gap:13px;padding:12px 15px;cursor:pointer;background:var(--bg2);transition:background .15s}
+.ch:hover{background:var(--bg3)}
+.dia-b{min-width:52px;height:44px;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--r);font-size:11px;font-weight:700}
+.ci-info{flex:1}.ci-tipo{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}.ci-canal{font-size:12px;color:var(--text3)}
+.chev{color:var(--text3);font-size:15px;transition:transform .2s;flex-shrink:0}.chev.op{transform:rotate(180deg)}
+.cb{padding:15px 18px 15px 80px;background:var(--bg);border-top:1px solid var(--border);display:none}.cb.op{display:block}
+.slbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:7px}
+.stxt{font-size:13px;color:var(--text2);line-height:1.8;font-style:italic;background:var(--bg2);border-left:3px solid var(--border2);padding:11px 15px;border-radius:0 var(--r) var(--r) 0;margin-bottom:13px;white-space:pre-wrap;word-break:break-word}
+.abox{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 13px;font-size:13px;font-weight:600}
+.ocat{margin-bottom:20px}
+.ocath{display:flex;align-items:center;gap:10px;padding:11px 15px;border-radius:var(--r);margin-bottom:7px}
+.ocatl{font-size:15px;font-weight:700}
+.oi{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-bottom:6px;overflow:hidden}
+.oih{display:flex;align-items:center;gap:11px;padding:11px 15px;cursor:pointer}.oih:hover{background:var(--bg3)}
+.ojust{font-size:13px;color:var(--text2);font-style:italic;flex:1}.oalert{font-size:11px;color:var(--amber)}
+.ob{padding:15px;background:var(--bg);border-top:1px solid var(--border);display:none}.ob.op{display:block}
+.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.ob-box{background:var(--bg2);border-radius:var(--r);padding:13px}
+.cls{margin-bottom:24px}
+.clp{display:flex;align-items:center;gap:10px;margin-bottom:13px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.clpi{font-size:20px}.clpl{font-size:16px;font-weight:700;color:var(--white)}
+.cli-list{display:flex;flex-direction:column;gap:6px}
+.cli{display:flex;align-items:flex-start;gap:11px;padding:9px 13px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .15s}
+.cli:hover{border-color:var(--border2)}.cli.done{background:var(--green-bg);border-color:#0a4a28}
+.chkbox{width:18px;height:18px;border:2px solid var(--border2);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}
+.cli.done .chkbox{background:var(--green);border-color:var(--green)}
+.chkm{color:#fff;font-size:11px;font-weight:700;display:none}.cli.done .chkm{display:block}
+.clt{font-size:13px;color:var(--text);line-height:1.5}.cli.done .clt{color:var(--text3);text-decoration:line-through}
+.rbtn{font-size:12px;color:var(--text3);cursor:pointer;background:none;border:none;padding:0;text-decoration:underline;margin-left:auto}
+.ri{display:flex;gap:15px;background:var(--bg2);border:1px solid var(--border);border-top:3px solid var(--red);border-radius:var(--rl);padding:17px;margin-bottom:9px}
+.rico{font-size:24px;flex-shrink:0}.rtit{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px}.rdesc{font-size:13px;color:var(--text2);line-height:1.6}
+@media(max-width:700px){.krow{grid-template-columns:1fr 1fr}.dp-grid,.ob-grid{grid-template-columns:1fr}nav{padding:0 12px}.page{padding:20px 14px}.cb{padding:13px 13px 13px 13px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">⚡ Cobrança</div>
+  <div class="tabs">
+    <div class="tab on" onclick="go('painel',this)">📊 Painel</div>
+    <div class="tab" onclick="go('cadencia',this)">📅 Cadência</div>
+    <div class="tab" onclick="go('objecoes',this)">💬 Objeções</div>
+    <div class="tab" onclick="go('checklist',this)">✅ Checklist</div>
+    <div class="tab" onclick="go('regras',this)">⚖️ Regras</div>
+  </div>
+</nav>
+
+<div id="page-painel" class="page on">
+  <div class="ph"><div class="pt">Painel de Inadimplência</div><div class="ps">Faça upload da planilha — classificação e script automáticos por cliente</div></div>
+  <div id="uzone" class="uzone">
+    <div class="uicon">📂</div>
+    <div class="utitle">Arraste sua planilha aqui ou clique para selecionar</div>
+    <div class="usub">Aceita .xlsx, .xls ou .csv &nbsp;·&nbsp; <a onclick="loadDemo(event)">usar demonstração</a></div>
+    <input type="file" id="finput" accept=".xlsx,.xls,.csv" style="display:none">
+  </div>
+  <div id="colmap" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rl);padding:17px;margin-bottom:20px">
+    <div style="font-size:13px;font-weight:600;color:var(--white);margin-bottom:11px">Mapeie as colunas da planilha</div>
+    <div id="cgrid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:13px"></div>
+    <button class="btn btnr" onclick="processData()">Classificar clientes →</button>
+  </div>
+  <div id="results" style="display:none">
+    <div class="krow" id="krow"></div>
+    <div class="frow">
+      <input type="text" id="search" placeholder="Buscar cliente..." oninput="renderTable()">
+      <select id="filtro" onchange="renderTable()">
+        <option value="">Todas as situações</option>
+        <option value="low">Atraso leve (D+1–9)</option>
+        <option value="mid">Atenção (D+10–19)</option>
+        <option value="sus">Suspenso (D+20–34)</option>
+        <option value="prot">Protesto iminente (D+35–64)</option>
+        <option value="crit">Jurídico (D+65+)</option>
+      </select>
+      <button class="btn" onclick="exportCSV()">Exportar CSV ↓</button>
+      <button class="btn" onclick="resetUpload()">Nova planilha ↺</button>
+    </div>
+    <div class="tw"><table>
+      <thead><tr>
+        <th style="width:29%">Cliente</th><th style="width:8%">Atraso</th>
+        <th style="width:12%">Total (R$)</th><th style="width:13%">Situação</th>
+        <th style="width:13%">Canal</th><th style="width:25%">Ação imediata</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div>
+    <div id="dpanel"></div>
+  </div>
+</div>
+
+<div id="page-cadencia" class="page">
+  <div class="ph"><div class="pt">Cadência de Cobrança</div><div class="ps">Contato diário — D-5 até D+35. Clique para ver o script.</div></div>
+  <div id="cadlist"></div>
+</div>
+
+<div id="page-objecoes" class="page">
+  <div class="ph"><div class="pt">Manual de Objeções</div><div class="ps">Script de contorno para cada justificativa do cliente.</div></div>
+  <div id="objlist"></div>
+</div>
+
+<div id="page-checklist" class="page">
+  <div class="ph"><div class="pt">Checklist Operacional</div><div class="ps">Marque as tarefas conforme realiza. Progresso salvo automaticamente.</div></div>
+  <div id="chklist"></div>
+</div>
+
+<div id="page-regras" class="page">
+  <div class="ph"><div class="pt">Regras de Ouro</div><div class="ps">Inegociáveis. Aplicam-se a todos os clientes sem exceção.</div></div>
+  <div id="reglist"></div>
+</div>
+
+<script>
+function go(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));document.getElementById('page-'+id).classList.add('on');el.classList.add('on')}
+
+const RC=[
+  {key:'low',label:'Atraso leve',min:1,max:9,css:'low',canal:'WhatsApp',acao:'WhatsApp solicitando posição. Se sem resposta em 2h, ligar.',
+   msg:(c,b)=>`Olá! Sua fatura está em aberto há ${c.dm} dia(s), no valor de R$ ${fmt(c.total)}. Caso já tenha pago, nos envie o comprovante.\n\n💰 Pague agora: ${b||'[COLE AQUI O LINK DO BOLETO]'} 🙏`},
+  {key:'mid',label:'Atenção',min:10,max:19,css:'mid',canal:'WhatsApp + Ligação',acao:'LIGAR obrigatoriamente após WhatsApp. Exigir data concreta hoje.',
+   msg:(c,b)=>`Sua fatura de R$ ${fmt(c.total)} está em aberto há ${c.dm} dias. Já incidem multa de 2% e juros de 1%/mês. Preciso de uma posição HOJE.\n\n💰 Pague agora: ${b||'[COLE AQUI O LINK DO BOLETO]'} ☎️`},
+  {key:'sus',label:'Suspenso',min:20,max:34,css:'sus',canal:'WhatsApp + Ligação',acao:'Serviços suspensos. Cobrar diariamente. Mencionar multas fiscais.',
+   msg:(c,b)=>`Seus serviços contábeis estão SUSPENSOS há ${c.dm-10} dia(s). Débito: R$ ${fmt(c.total)}. Empresa sem cobertura contábil — multas fiscais automáticas.\n\n💰 Quite agora para reativar: ${b||'[COLE AQUI O LINK DO BOLETO]'} ☎️`},
+  {key:'prot',label:'Protesto iminente',min:35,max:64,css:'prot',canal:'WhatsApp + Ligação',acao:'Avisar sobre protesto em cartório e negativação SERASA/SPC.',
+   msg:(c,b)=>`Seu débito de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Título vai para PROTESTO EM CARTÓRIO e CNPJ negativado no SERASA/SPC.\n\n💰 Evite o protesto: ${b||'[COLE AQUI O LINK DO BOLETO]'}`},
+  {key:'crit',label:'Jurídico',min:65,max:9999,css:'crit',canal:'Advogado',acao:'Encaminhar para advogado. Enviar toda documentação.',
+   msg:(c,b)=>`Notificação formal: débito de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Título protestado, CNPJ negativado. Prazo: 5 dias úteis antes de ação judicial.\n\n💰 Regularização: ${b||'[COLE AQUI O LINK DO BOLETO]'}`},
+];
+
+function classify(d){for(let r of RC)if(d>=r.min&&d<=r.max)return r;return RC[0]}
+function fmt(v){return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
+
+// ── PARSER ROBUSTO (ZIP sem dependências) ──
+let pakoReady=false;
+function loadPako(cb){
+  if(pakoReady){cb();return}
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako_inflate.min.js';
+  s.onload=()=>{pakoReady=true;cb()};
+  s.onerror=()=>cb(new Error('pako failed'));
+  document.head.appendChild(s);
+}
+
+function parseXLS(file,cb){
+  loadPako(err=>{
+    if(err){cb(err);return}
+    const reader=new FileReader();
+    reader.onload=e=>{
+      try{
+        const bytes=new Uint8Array(e.target.result);
+        // Check if ZIP (xlsx)
+        if(bytes[0]===0x50&&bytes[1]===0x4B){
+          const files=unzip(bytes);
+          const rows=sheetToRows(files);
+          cb(null,rows);
+        } else {
+          // Try CSV
+          const text=new TextDecoder('utf-8').decode(bytes);
+          cb(null,csvToRows(text));
+        }
+      }catch(ex){cb(ex)}
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+function unzip(bytes){
+  const files={};
+  let i=0;
+  while(i<bytes.length-4){
+    if(bytes[i]===0x50&&bytes[i+1]===0x4B&&bytes[i+2]===0x03&&bytes[i+3]===0x04){
+      const meth=bytes[i+8]|(bytes[i+9]<<8);
+      const csz=bytes[i+18]|(bytes[i+19]<<8)|(bytes[i+20]<<16)|(bytes[i+21]<<24);
+      const usz=bytes[i+22]|(bytes[i+23]<<8)|(bytes[i+24]<<16)|(bytes[i+25]<<24);
+      const fnl=bytes[i+26]|(bytes[i+27]<<8);
+      const exl=bytes[i+28]|(bytes[i+29]<<8);
+      const fns=i+30;
+      const fn=new TextDecoder().decode(bytes.slice(fns,fns+fnl));
+      const ds=fns+fnl+exl;
+      try{
+        let data;
+        if(meth===0) data=bytes.slice(ds,ds+usz);
+        else data=window.pako.inflateRaw(bytes.slice(ds,ds+csz));
+        if(data&&data.length>0) files[fn]=new TextDecoder('utf-8').decode(data);
+      }catch(e){}
+      i=ds+Math.max(csz,1);
+    } else i++;
+  }
+  return files;
+}
+
+function sheetToRows(files){
+  const shared=[];
+  if(files['xl/sharedStrings.xml']){
+    new DOMParser().parseFromString(files['xl/sharedStrings.xml'],'text/xml')
+      .querySelectorAll('si').forEach(si=>shared.push([...si.querySelectorAll('t')].map(t=>t.textContent).join('')));
+  }
+  const sk=Object.keys(files).find(k=>/xl\/worksheets\/sheet\d+\.xml/.test(k));
+  if(!sk) throw new Error('Planilha não encontrada no arquivo.');
+  const rows=[];
+  new DOMParser().parseFromString(files[sk],'text/xml').querySelectorAll('row').forEach(rowEl=>{
+    const rd={};
+    rowEl.querySelectorAll('c').forEach(c=>{
+      const ref=c.getAttribute('r')||'';
+      const col=ref.replace(/[0-9]/g,'');
+      const t=c.getAttribute('t')||'';
+      const v=c.querySelector('v');
+      let val='';
+      if(t==='s'&&v) val=shared[parseInt(v.textContent)]||'';
+      else if(t==='inlineStr') val=[...c.querySelectorAll('t')].map(x=>x.textContent).join('');
+      else if(v) val=v.textContent;
+      rd[col]=val;
+    });
+    rows.push(rd);
+  });
+  return rows;
+}
+
+function csvToRows(text){
+  return text.split('\n').filter(l=>l.trim()).map(line=>{
+    const cells=line.split(',');
+    const row={};
+    cells.forEach((c,i)=>{row[String.fromCharCode(65+i)]=c.replace(/^"|"$/g,'').trim()});
+    return row;
+  });
+}
+
+// ── UPLOAD ──
+let rawRows=[],processedData=[],selectedIdx=null;
+const bMap={};
+const uz=document.getElementById('uzone'),fi=document.getElementById('finput');
+uz.addEventListener('click',()=>fi.click());
+uz.addEventListener('dragover',e=>{e.preventDefault();uz.classList.add('drag')});
+uz.addEventListener('dragleave',()=>uz.classList.remove('drag'));
+uz.addEventListener('drop',e=>{e.preventDefault();uz.classList.remove('drag');handleFile(e.dataTransfer.files[0])});
+fi.addEventListener('change',e=>handleFile(e.target.files[0]));
+
+function handleFile(file){
+  if(!file) return;
+  uz.querySelector('.utitle').textContent='Carregando e processando...';
+  parseXLS(file,(err,rows)=>{
+    uz.querySelector('.utitle').textContent='Arraste sua planilha aqui ou clique para selecionar';
+    if(err){alert('Erro ao ler o arquivo: '+err.message+'\n\nDica: exporte como CSV no seu sistema financeiro.');return}
+    if(!rows||rows.length<2){alert('Planilha vazia ou não reconhecida.');return}
+    rawRows=rows;
+    showColMap(rows[0]);
+  });
+}
+
+function showColMap(hRow){
+  document.getElementById('colmap').style.display='block';
+  const cols=Object.entries(hRow);
+  const fields=[{key:'nome',label:'Nome do cliente'},{key:'dias',label:'Dias em atraso'},{key:'valor',label:'Valor em aberto'}];
+  document.getElementById('cgrid').innerHTML=fields.map(f=>`
+    <div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.05em">${f.label}</div>
+      <select id="map-${f.key}" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:13px;padding:7px 10px">
+        <option value="">— selecionar —</option>
+        ${cols.map(([col,hdr])=>`<option value="${col}">${hdr}</option>`).join('')}
+      </select>
+    </div>`).join('');
+  cols.forEach(([col,hdr])=>{
+    const h=hdr.toLowerCase();
+    if(h.includes('nome')){const s=document.getElementById('map-nome');if(!s.value)s.value=col}
+    if(h.includes('dia')&&!h.includes('data')&&!h.includes('venc')){const s=document.getElementById('map-dias');if(!s.value)s.value=col}
+    if(h.includes('aberto')||h.includes('parcela')){const s=document.getElementById('map-valor');if(!s.value)s.value=col}
+  });
+}
+
+function processData(){
+  const nC=document.getElementById('map-nome').value;
+  const dC=document.getElementById('map-dias').value;
+  const vC=document.getElementById('map-valor').value;
+  if(!nC||!dC||!vC){alert('Mapeie todas as colunas antes de continuar.');return}
+  const clients={};
+  rawRows.slice(1).forEach(row=>{
+    const nome=String(row[nC]||'').trim();
+    if(!nome) return;
+    const dias=Math.max(0,Math.round(parseFloat(String(row[dC]||'0').replace(',','.'))||0));
+    const valor=Math.round((parseFloat(String(row[vC]||'0').replace(/[R$\s.]/g,'').replace(',','.'))||0)*100)/100;
+    if(dias<=0&&valor<=0) return;
+    if(!clients[nome]) clients[nome]={nome,dm:0,total:0,parcelas:[]};
+    clients[nome].parcelas.push({dias,valor});
+    clients[nome].total=Math.round((clients[nome].total+valor)*100)/100;
+    if(dias>clients[nome].dm) clients[nome].dm=dias;
+  });
+  processedData=Object.values(clients).filter(c=>c.dm>0).sort((a,b)=>b.dm-a.dm);
+  showResults();
+}
+
+const DEMO=[{nome:'RCS & BRC CONSULTORIA LTDA',parcelas:[{dias:187,valor:497},{dias:156,valor:600},{dias:95,valor:497},{dias:64,valor:497},{dias:5,valor:497}],total:3686.08,dm:187},{nome:'SANDRO NASCIMENTO CORDEIRO',parcelas:[{dias:126,valor:595},{dias:95,valor:397},{dias:64,valor:432},{dias:5,valor:432}],total:2290.69,dm:126},{nome:'COMERCIAL DE ALTA CONVERSAO',parcelas:[{dias:95,valor:794},{dias:64,valor:1613}],total:2407.01,dm:95},{nome:'MS2 Nutrition Do Brasil',parcelas:[{dias:64,valor:1403},{dias:36,valor:1403},{dias:5,valor:1535}],total:4343.55,dm:64},{nome:'LARISSA GOMES SILVA DE SOUZA',parcelas:[{dias:47,valor:537},{dias:30,valor:537},{dias:21,valor:950},{dias:10,valor:950}],total:2975,dm:47},{nome:'BEM CURSOS LTDA',parcelas:[{dias:36,valor:497},{dias:5,valor:497}],total:994,dm:36},{nome:'EGREGORA TREINAMENTOS',parcelas:[{dias:25,valor:524},{dias:14,valor:897}],total:1421.25,dm:25},{nome:'FLORIPA CALISTENIA LTDA',parcelas:[{dias:5,valor:1997}],total:1997,dm:5},{nome:'JT BYE DIASTASE LTDA',parcelas:[{dias:5,valor:2409}],total:2409.81,dm:5}];
+
+function loadDemo(e){e.stopPropagation();processedData=DEMO.map(d=>({...d}));showResults()}
+function showResults(){document.getElementById('uzone').style.display='none';document.getElementById('colmap').style.display='none';document.getElementById('results').style.display='block';renderKPIs();renderTable()}
+function resetUpload(){processedData=[];selectedIdx=null;document.getElementById('results').style.display='none';document.getElementById('colmap').style.display='none';document.getElementById('uzone').style.display='block';document.getElementById('dpanel').innerHTML='';fi.value=''}
+
+function renderKPIs(){
+  const val=processedData.reduce((a,c)=>a+c.total,0);
+  const crit=processedData.filter(c=>c.dm>=35).length;
+  const jur=processedData.filter(c=>c.dm>=65).length;
+  document.getElementById('krow').innerHTML=`
+    <div class="kpi"><div class="kl">Inadimplentes</div><div class="kv red">${processedData.length}</div></div>
+    <div class="kpi"><div class="kl">Total em aberto</div><div class="kv red" style="font-size:18px">R$ ${fmt(val)}</div></div>
+    <div class="kpi"><div class="kl">Risco de protesto (D+35+)</div><div class="kv amb">${crit}</div></div>
+    <div class="kpi"><div class="kl">Para jurídico (D+65+)</div><div class="kv ${jur>0?'red':'grn'}">${jur}</div></div>`;
+}
+
+function getFiltered(){
+  const q=(document.getElementById('search').value||'').toLowerCase();
+  const f=document.getElementById('filtro').value;
+  return processedData.filter(c=>{if(q&&!c.nome.toLowerCase().includes(q))return false;if(f&&classify(c.dm).key!==f)return false;return true});
+}
+
+function renderTable(){
+  const rows=getFiltered();
+  const tb=document.getElementById('tbody');
+  if(!rows.length){tb.innerHTML=`<tr><td colspan="6" style="padding:2rem;text-align:center;color:var(--text3)">Nenhum cliente encontrado.</td></tr>`;return}
+  tb.innerHTML=rows.map(c=>{
+    const r=classify(c.dm);const idx=processedData.indexOf(c);
+    return `<tr class="clk ${selectedIdx===idx?'sel':''}" onclick="showDetail(${idx})">
+      <td title="${c.nome}">${c.nome}</td><td>D+${c.dm}</td><td>R$ ${fmt(c.total)}</td>
+      <td><span class="bdg ${r.css}">${r.label}</span></td>
+      <td style="font-size:12px">${r.canal}</td>
+      <td style="font-size:12px">${r.acao.substring(0,50)}${r.acao.length>50?'…':''}</td>
+    </tr>`;
+  }).join('');
+}
+
+function showDetail(idx){
+  selectedIdx=idx;renderTable();
+  const c=processedData[idx];const r=classify(c.dm);
+  const boleto=bMap[idx]||'';const msg=r.msg(c,boleto);
+  const alrt=c.dm>=65?`<div class="dalert">⚠️ Encaminhar para advogado imediatamente — débito há mais de 65 dias.</div>`
+    :c.dm>=35?`<div class="dalert" style="color:var(--purple);border-color:#4a1d95;background:#0f0818">⚠️ Protesto em cartório — executar urgentemente.</div>`:'';
+  document.getElementById('dpanel').innerHTML=`
+    <div class="dp">
+      <div class="dp-top">
+        <div><div class="dp-name">${c.nome}</div>
+        <div class="dp-meta">D+${c.dm} · R$ ${fmt(c.total)} em aberto · <span class="bdg ${r.css}">${r.label}</span></div></div>
+        <button class="btn" onclick="selectedIdx=null;document.getElementById('dpanel').innerHTML='';renderTable()">Fechar ×</button>
+      </div>
+      ${alrt}
+      <div class="dp-grid">
+        <div class="dp-box">
+          <div class="dbt">Canal de contato</div><div class="dba" style="margin-bottom:12px">${r.canal}</div>
+          <div class="dbt">O que fazer agora</div><div class="dba" style="margin-bottom:14px">${r.acao}</div>
+          <div class="dbt">Parcelas em aberto</div>
+          <div>${(c.parcelas||[]).map(p=>`<div class="parc-row"><span>${p.venc||'—'}</span><span style="color:${(p.dias||c.dm)>=35?'var(--red)':(p.dias||c.dm)>=20?'var(--amber)':'var(--text2)'}">R$ ${fmt(p.valor)} · D+${p.dias||c.dm}</span></div>`).join('')}</div>
+        </div>
+        <div class="dp-box">
+          <div class="dbt">Script de cobrança — WhatsApp</div>
+          <div class="brow">
+            <label>🔗 Link do boleto:</label>
+            <input type="url" id="bi-${idx}" value="${boleto}" placeholder="Cole o link do boleto aqui" oninput="updB(${idx})">
+          </div>
+          <div class="smsg" id="sm-${idx}">${msg}</div>
+          <button class="btn cp-btn" onclick="cpMsg(${idx})">Copiar mensagem</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById('dpanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function updB(idx){
+  bMap[idx]=(document.getElementById('bi-'+idx)||{}).value||'';
+  const c=processedData[idx];const r=classify(c.dm);
+  const el=document.getElementById('sm-'+idx);if(el)el.textContent=r.msg(c,bMap[idx]);
+}
+function cpMsg(idx){
+  const el=document.getElementById('sm-'+idx);if(!el)return;
+  navigator.clipboard.writeText(el.textContent).then(()=>{
+    const btn=el.nextElementSibling;btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='Copiar mensagem',2000);
+  });
+}
+function exportCSV(){
+  const rows=getFiltered();
+  const h='Cliente,Dias,Total R$,Situação,Canal,Ação\n';
+  const b=rows.map(c=>{const r=classify(c.dm);return`"${c.nome}","${c.dm}","${fmt(c.total)}","${r.label}","${r.canal}","${r.acao}"`}).join('\n');
+  const blob=new Blob(['\ufeff'+h+b],{type:'text/csv;charset=utf-8'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cobranca.csv';a.click();URL.revokeObjectURL(url);
+}
+
+// ── CADÊNCIA ──
+const CAD=[
+  {dia:'D-5',tipo:'Preventivo',canal:'WhatsApp',cor:'#10b981',bg:'#08201a',acao:'Envio preventivo. Registrar no sistema.',
+   s:`Olá [NOME] 😊 Passando para lembrar que sua fatura de [MÊS] (R$ [VALOR]) vence em 5 dias — dia [DATA].\n\n💰 Link para pagamento: [COLE AQUI O LINK DO BOLETO]\n\nQualquer dúvida, estamos à disposição!`},
+  {dia:'D+1',tipo:'1º Contato',canal:'WhatsApp',cor:'#f59e0b',bg:'#201800',acao:'WhatsApp. Se sem resposta até fim do dia, ligar. Registrar.',
+   s:`Olá [NOME], sua fatura de R$ [VALOR] venceu ontem. Caso já tenha pago, nos envie o comprovante.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] 🙏`},
+  {dia:'D+2',tipo:'2º Contato',canal:'Ligação',cor:'#f97316',bg:'#201008',acao:'LIGAR obrigatoriamente. Anotar resposta exata. Se pedir boleto, enviar link pelo WhatsApp.',
+   s:`[NOME], aqui é [SEU NOME] do escritório. Sua fatura de R$ [VALOR] está em aberto desde [DATA]. Consegue pagar hoje?\n\n[Se pedir link → enviar pelo WhatsApp imediatamente]`},
+  {dia:'D+3',tipo:'3º Contato',canal:'WhatsApp',cor:'#f97316',bg:'#201008',acao:'WhatsApp firme. Se sem resposta em 2h, ligar. Registrar.',
+   s:`[NOME], sua fatura de R$ [VALOR] está em aberto há 3 dias. Preciso de uma posição sua HOJE.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+4',tipo:'4º Contato',canal:'WhatsApp + Ligação',cor:'#ef4444',bg:'#200808',acao:'WhatsApp informando multa/juros + LIGAR logo após. Registrar.',
+   s:`[NOME], fatura de R$ [VALOR] em aberto há 4 dias. Incidem multa 2% + juros 1%/mês. Valor atualizado: R$ [VALOR+ENCARGOS]. Regularize até amanhã.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+5',tipo:'5º Contato',canal:'Ligação + WhatsApp',cor:'#ef4444',bg:'#200808',acao:'LIGAR e WhatsApp simultaneamente. Pressionar por data concreta.',
+   s:`[NOME], 5 dias em aberto (R$ [VALOR]). Metade do prazo antes da suspensão. Preciso de uma resposta hoje.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+6',tipo:'6º Contato',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp. Aguardar 3h. Se sem retorno, ligar.',
+   s:`[NOME], faltam 4 dias para a suspensão dos seus serviços. Débito: R$ [VALOR]. Preciso de uma resposta HOJE.\n\n💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+7',tipo:'7º Contato',canal:'WhatsApp + Ligação',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp formal + LIGAR imediatamente após. Registrar.',
+   s:`[NOME], débito de R$ [VALOR] em aberto há 7 dias. SUSPENSÃO em 3 dias sem regularização ou acordo.\n\n💰 Evite a suspensão: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+8',tipo:'8º Contato',canal:'Ligação',cor:'#b91c1c',bg:'#180404',acao:'LIGAR obrigatório. Aceitar proposta só com data e valor escritos.',
+   s:`[NOME], 2 dias para a suspensão. Última ligação antes de tomarmos medidas. Tem condição de pagar hoje?\n\n[Se aceitar → enviar link do boleto pelo WhatsApp]`},
+  {dia:'D+9',tipo:'9º Contato — ÚLTIMO DIA',canal:'WhatsApp + Ligação',cor:'#991b1b',bg:'#160303',acao:'WhatsApp + LIGAR. Duplo contato obrigatório. Registrar horário.',
+   s:`[NOME], AMANHÃ seus serviços serão suspensos (R$ [VALOR]). Última oportunidade.\n\n💰 Pague agora e evite a suspensão: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+10',tipo:'🔴 SUSPENSÃO TOTAL',canal:'WhatsApp + Equipe Interna',cor:'#fff',bg:'#7f1d1d',acao:'EXECUTAR: bloquear portal, entregas e acesso. Notificar equipe. INFORMAR CEO.',
+   s:`[NOME], comunicamos a SUSPENSÃO IMEDIATA de todos os serviços contábeis em razão do débito de R$ [VALOR] sem posição por 10 dias.\n\n💰 Para reativar, quite agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+11',tipo:'Pós-Suspensão — Dia 1',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'Reforçar que empresa está sem cobertura contábil. Registrar.',
+   s:`[NOME], serviços SUSPENSOS. Empresa sem cobertura — multas fiscais automáticas. Regularize agora.\n\n💰 Quite agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+12',tipo:'Pós-Suspensão — Dia 2',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Mencionar obrigações acessórias próximas.',
+   s:`[NOME], serviços suspensos há 2 dias. DAS, DCTF e obrigações não serão entregues — multas automáticas. Vamos resolver hoje?\n\n[Se aceitar → enviar link pelo WhatsApp]`},
+  {dia:'D+13',tipo:'Pós-Suspensão — Dia 3',canal:'WhatsApp + Ligação',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp + LIGAR. Mencionar multas fiscais específicas.',
+   s:`[NOME], além do débito de R$ [VALOR], sua empresa acumula multas fiscais. Regularize agora.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+14',tipo:'Pós-Suspensão — Dia 4',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Tentar pagamento parcial. Qualquer acordo por escrito.',
+   s:`[NOME], 14 dias em aberto, 4 suspenso. Tem condição de pagar ao menos parte hoje?\n\n[Se aceitar → enviar link pelo WhatsApp imediatamente]`},
+  {dia:'D+15',tipo:'Pós-Suspensão — Dia 5',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'Alerta de escalada iminente. Última chance de acordo favorável.',
+   s:`[NOME], 15 dias em aberto. Próximos de medidas legais. Ainda posso negociar.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+16',tipo:'Pós-Suspensão — Dia 6',canal:'WhatsApp + Ligação',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp + LIGAR após. Registrar com horário.',
+   s:`[NOME], débito de R$ [VALOR] em aberto há 16 dias. Protesto em cartório em breve.\n\n💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+17',tipo:'Pós-Suspensão — Dia 7',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'Última ligação antes do aviso de protesto. Deixar recado na caixa postal.',
+   s:`[NOME], última ligação antes do protesto em cartório. Ainda podemos resolver.\n\n[Se aceitar → enviar link pelo WhatsApp]`},
+  {dia:'D+18',tipo:'Pós-Suspensão — Dia 8',canal:'WhatsApp + Ligação',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp + LIGAR. Duplo contato. Registrar com horário.',
+   s:`[NOME], em 2 dias título vai para PROTESTO EM CARTÓRIO. Restringe todo crédito do CNPJ. Ainda dá tempo.\n\n💰 Pague agora e evite o protesto: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+19',tipo:'Pós-Suspensão — Dia 9',canal:'WhatsApp + Ligação',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp + LIGAR. Duplo contato. Registrar tudo com horário.',
+   s:`[NOME], AMANHÃ débito de R$ [VALOR] vai para protesto. Última oportunidade.\n\n💰 Regularize agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+20',tipo:'⚠️ AVISO DE PROTESTO',canal:'WhatsApp + Ligação',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp formal + LIGAR. Aguardar 5 dias antes de executar.',
+   s:`[NOME], débito de R$ [VALOR] em aberto há 20 dias. Em 5 dias úteis o título será PROTESTADO e CNPJ negativado no SERASA/SPC.\n\n💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+25',tipo:'🟣 PROTESTO EM CARTÓRIO',canal:'Cartório + SERASA + WhatsApp',cor:'#fff',bg:'#3b0764',acao:'Levar título ao cartório. Negativar SERASA/SPC. Informar CEO.',
+   s:`[NOME], título de R$ [VALOR] encaminhado para PROTESTO EM CARTÓRIO. CNPJ sendo negativado no SERASA/SPC. Cancelamento: quitação integral + custas cartorárias.\n\n💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+35',tipo:'⚖️ AÇÃO JUDICIAL',canal:'Advogado + Carta Registrada',cor:'#94a3b8',bg:'#0a0a12',acao:'Acionar advogado. Enviar contrato, NFs e histórico completo.',
+   s:`Processo encaminhado ao jurídico. Débito: R$ [VALOR + MULTA + JUROS + CUSTAS]. Cliente protestado e negativado.`},
+];
+
+function renderCadencia(){
+  document.getElementById('cadlist').innerHTML=CAD.map((c,i)=>`
+    <div class="ci">
+      <div class="ch" onclick="tgC(${i})">
+        <div class="dia-b" style="background:${c.bg};color:${c.cor};border:1px solid ${c.cor}40">
+          <span style="font-size:9px;opacity:.8">DIA</span><span style="font-size:14px">${c.dia}</span>
+        </div>
+        <div class="ci-info"><div class="ci-tipo" style="color:${c.cor}">${c.tipo}</div><div class="ci-canal">📲 ${c.canal}</div></div>
+        <div class="chev" id="cv${i}">▼</div>
+      </div>
+      <div class="cb" id="cb${i}">
+        <div class="slbl">💬 Script / Mensagem</div>
+        <div class="stxt">${c.s}</div>
+        <div class="slbl">✅ Ação obrigatória</div>
+        <div class="abox" style="color:${c.cor};border-color:${c.cor}40;background:${c.bg}">${c.acao}</div>
+      </div>
+    </div>`).join('');
+}
+function tgC(i){const b=document.getElementById('cb'+i),cv=document.getElementById('cv'+i);const o=b.classList.toggle('op');cv.classList.toggle('op',o)}
+
+// ── OBJEÇÕES ──
+const OBJ=[
+  {cat:'💸 Financeiro',cor:'#f59e0b',bg:'#201800',itens:[
+    {j:'Estou sem dinheiro agora',a:'Clássica. Qualificar se real ou enrolação.',r:'Entendo. Mas preciso de uma DATA concreta hoje. Sem data = processo segue automaticamente amanhã. Quando você espera ter uma entrada?',ac:'Exigir dia exato. Registrar. Cobrar no dia anterior.'},
+    {j:'Meu cliente não me pagou',a:'Frequente. Pode ser real.',r:'Entendo, mas seu débito conosco não depende do seu cliente. Me dá a data de recebimento dele — programamos logo depois. Máximo 7 dias.',ac:'Carência máx. 7 dias. Formalizar por escrito.'},
+    {j:'Vou pagar semana que vem',a:'Promessa vaga. Não aceitar sem dia exato.',r:'Semana que vem qual dia EXATAMENTE? Preciso registrar: dia X, valor R$ Y, via [forma]. Com isso registrado, trava o processo.',ac:'Nunca aceitar sem dia exato. Cobrar no dia anterior.'},
+    {j:'Posso pagar só metade agora',a:'Abertura real. Aproveitar.',r:'Tudo bem, metade resolve parte. Manda o comprovante hoje e combinamos o restante com data e valor definidos, por escrito.',ac:'Aceitar parcial só com restante formalizado. Serviços não voltam até quitação total.'},
+    {j:'Não tenho dinheiro e não sei quando vou ter',a:'Crise real ou desresponsabilização.',r:'Sem perspectiva não consigo segurar o protesto. Qual o menor valor que você consegue mandar agora? Qualquer entrada mantém o diálogo.',ac:'Se recusar totalmente, escalar para protesto.'},
+  ]},
+  {cat:'🏥 Saúde',cor:'#10b981',bg:'#08201a',itens:[
+    {j:'Estou doente / hospitalizado',a:'Empatia no tom, firmeza no processo.',r:'Lamento muito. Para proteger você do protesto, tem alguém — familiar ou sócio — que pode dar uma posição enquanto você se recupera?',ac:'Pedir contato de responsável. Carência de 5 dias. Informar CEO.'},
+    {j:'Problema de saúde na família',a:'Delicado. Adaptar tom.',r:'Sinto muito. Quando as coisas estabilizarem, quando você conseguiria olhar para isso? Com uma previsão, seguro mais alguns dias.',ac:'Carência de até 7 dias documentada. Cobrar na data combinada.'},
+    {j:'Estou de licença / afastado',a:'A empresa continua operando.',r:'Entendo. Mas a empresa segue ativa. Quem é o responsável financeiro que posso acionar enquanto você está afastado?',ac:'Redirecionar para sócio ou responsável. Não suspender cobrança.'},
+  ]},
+  {cat:'🏢 Operacional',cor:'#3b82f6',bg:'#081828',itens:[
+    {j:'Empresa em dificuldades',a:'Qualificar: pontual ou estrutural?',r:'É pontual ou estrutural? Pontual, parcelamos. Estrutural, precisamos conversar sobre o futuro do contrato também.',ac:'Se estrutural: escalar para CEO sobre continuidade.'},
+    {j:'Mudamos de sócio',a:'Tentativa de transferir responsabilidade.',r:'Mudança societária não altera as obrigações do CNPJ. O débito é da empresa. Quem é o responsável financeiro atual?',ac:'Não aceitar. Exigir contato do novo responsável.'},
+    {j:'Não recebi a fatura / boleto',a:'Pretexto comum. Eliminar na hora.',r:'Vou reenviar o link agora mesmo. [Enviar imediatamente] Você recebeu? Consegue pagar hoje?',ac:'Reenviar DURANTE a ligação. Não dar prazo adicional.'},
+    {j:'Achei que já tinha pago',a:'Pode ser confusão genuína.',r:'Aqui consta em aberto. Se tiver o comprovante, me manda agora que baixo imediatamente.',ac:'Aguardar comprovante por 2h. Se não vier, retomar cobrança.'},
+    {j:'Vou encerrar a empresa',a:'URGÊNCIA MÁXIMA.',r:'Encerramento não cancela dívidas — migram para o CPF dos sócios. A baixa contábil também só ocorre com conta zerada.',ac:'ESCALAR PARA CEO IMEDIATAMENTE. Negociar acordo urgente.'},
+  ]},
+  {cat:'⚠️ Contestação do Serviço',cor:'#ef4444',bg:'#1a0505',itens:[
+    {j:'Não estou satisfeito com o serviço',a:'Separar cobrança de qualidade.',r:'Ouço você e vou acionar o responsável técnico hoje. Mas o débito é por serviços já prestados — são questões separadas.',ac:'NUNCA negociar desconto durante cobrança. Escalar para sócio.'},
+    {j:'Vocês cometeram um erro',a:'Não concordar nem discordar.',r:'Isso será apurado com urgência — vou acionar o responsável hoje. O débito precisa ser regularizado enquanto apuramos.',ac:'ESCALAR PARA CEO. Não dar desconto sem autorização.'},
+    {j:'Vou trocar de escritório',a:'Pressão para desconto. Não ceder.',r:'Quero que você fique, mas essa conversa é com o sócio. O débito precisa ser quitado independente dessa decisão.',ac:'Escalar para CEO. Não suspender cobrança.'},
+  ]},
+  {cat:'👻 Ghosting / Enrolação',cor:'#a855f7',bg:'#0f0820',itens:[
+    {j:'Não atende o telefone / some',a:'Múltiplos canais simultâneos.',r:'"Tentei te ligar às [HORA]. Preciso de posição sobre R$ [VALOR] até hoje às 18h. Sem retorno, processo segue automaticamente amanhã."',ac:'Documentar TODAS as tentativas com horário. Ligar em horários variados. WhatsApp repetido.'},
+    {j:'"Te ligo mais tarde" e não liga',a:'Cliente tomou o controle. Retomar.',r:'"Fico no aguardo até [HORA]. Caso não receba seu contato até lá, entrarei em contato novamente."',ac:'Ligar de volta no horário definido sem falta.'},
+    {j:'Responde mas não dá data',a:'Engajamento sem comprometimento.',r:'Conversa sem data não resolve. Preciso de uma de duas coisas HOJE: comprovante ou data concreta. Sem um desses, amanhã segue para protesto.',ac:'Se não der data hoje, executar próximo nível.'},
+    {j:'Promete e não paga (recorrente)',a:'Quebra recorrente. Escalar.',r:'Você me disse que pagaria no dia X e não aconteceu — já aconteceu antes. Sem pagamento hoje ou acordo formal, não consigo mais segurar. Minha diretoria está ciente.',ac:'Mencionar CEO. Exigir pagamento HOJE ou acordo formal. Sem nova promessa verbal.'},
+  ]},
+];
+
+function renderObjecoes(){
+  document.getElementById('objlist').innerHTML=OBJ.map((cat,ci)=>`
+    <div class="ocat">
+      <div class="ocath" style="background:${cat.bg};border:1px solid ${cat.cor}30">
+        <div class="ocatl" style="color:${cat.cor}">${cat.cat}</div>
+        <div style="font-size:12px;color:${cat.cor}80;margin-left:auto">${cat.itens.length} situações</div>
+      </div>
+      ${cat.itens.map((item,ii)=>`
+        <div class="oi">
+          <div class="oih" onclick="tgO(${ci},${ii})">
+            <span style="color:var(--text3);font-size:15px">🗣️</span>
+            <div class="ojust">"${item.j}"</div>
+            <div class="oalert">⚡ ${item.a}</div>
+            <div class="chev" id="cvo${ci}-${ii}">▼</div>
+          </div>
+          <div class="ob" id="ob${ci}-${ii}">
+            <div class="ob-grid">
+              <div class="ob-box"><div class="slbl">💬 A atendente responde</div><div class="stxt" style="border-color:${cat.cor}60">${item.r}</div></div>
+              <div class="ob-box"><div class="slbl">✅ Ação obrigatória</div><div class="abox" style="color:${cat.cor};border-color:${cat.cor}40;background:${cat.bg}">${item.ac}</div></div>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`).join('');
+}
+function tgO(ci,ii){const b=document.getElementById(`ob${ci}-${ii}`),cv=document.getElementById(`cvo${ci}-${ii}`);const o=b.classList.toggle('op');cv.classList.toggle('op',o)}
+
+// ── CHECKLIST ──
+const CHKS=[
+  {p:'Diário',i:'📅',k:'d',t:['Verificar vencimentos do dia anterior — WhatsApp para todos D+1','Ligar para devedores D+2, D+5, D+8, D+12, D+14, D+17','Registrar TODOS os contatos: data, canal, resultado, próximo passo','Confirmar recebimentos e baixar pagamentos no sistema','Executar suspensões de clientes D+10 sem posição — SEM EXCEÇÃO','Atualizar status de cada cliente devedor']},
+  {p:'Semanal',i:'📊',k:'w',t:['Segunda: consolidar relatório de inadimplência','Revisar D+7, D+10, D+20 — escalar ações','WhatsApp em massa para críticos — ligar na sequência','Propor parcelamentos para casos com dificuldade real','Comunicar CEO sobre risco de protesto ou jurídico','Atualizar painel de inadimplência']},
+  {p:'Quinzenal',i:'🔍',k:'q',t:['Reunião com CEO: relatório de evolução','Revisar clientes suspensos — cobrar retorno','Avaliar casos para encaminhar ao cartório','Checar promessas de pagamento não cumpridas','Revisar scripts e cadência — ajustar o que não funciona']},
+  {p:'Mensal',i:'📈',k:'m',t:['Relatório: taxa de inadimplência, valor em aberto, % recuperado','Ranking de maiores devedores — priorizar esforços','Avaliar protestos e ações jurídicas','Revisar política de cobrança com CEO','Propor ajustes de contrato — cláusulas de multa e juros']},
+];
+
+function gC(k){try{return JSON.parse(localStorage.getItem('c_'+k)||'[]')}catch{return[]}}
+function sC(k,a){try{localStorage.setItem('c_'+k,JSON.stringify(a))}catch{}}
+function renderChecklist(){
+  document.getElementById('chklist').innerHTML=CHKS.map(cl=>{
+    const chk=gC(cl.k);const pct=Math.round(chk.length/cl.t.length*100);
+    return`<div class="cls"><div class="clp"><span class="clpi">${cl.i}</span><span class="clpl">${cl.p}</span>
+      <span style="font-size:12px;color:${pct===100?'var(--green)':'var(--text3)'};margin-left:8px">${chk.length}/${cl.t.length} — ${pct}%</span>
+      <button class="rbtn" onclick="rC('${cl.k}')">Limpar</button></div>
+      <div class="cli-list">${cl.t.map((t,i)=>{const done=chk.includes(i);return`<div class="cli ${done?'done':''}" onclick="tgChk('${cl.k}',${i})">
+        <div class="chkbox"><span class="chkm">✓</span></div><div class="clt">${t}</div></div>`}).join('')}
+      </div></div>`;
+  }).join('');
+}
+function tgChk(k,i){let c=gC(k);c=c.includes(i)?c.filter(x=>x!==i):[...c,i];sC(k,c);renderChecklist()}
+function rC(k){sC(k,[]);renderChecklist()}
+
+// ── REGRAS ──
+const REGRAS=[
+  {icon:'⚡',t:'Registro obrigatório',d:'TODO contato com devedor deve ser registrado: data, canal, resposta, próximo passo. Sem registro, não aconteceu.'},
+  {icon:'🔒',t:'Suspensão em D+10 é inegociável',d:'Se o cliente não passou nenhuma posição até D+10, a suspensão é executada no mesmo dia. Sem aviso extra, sem prorrogação.'},
+  {icon:'🤝',t:'Parcelamento com critério',d:'Oferecer parcelamento apenas para clientes com histórico bom e dificuldade real comprovada. Máximo 3x. Sempre formalizar por escrito.'},
+  {icon:'📵',t:'Silêncio = escalada automática',d:'Cliente que não responde em 48h sobe automaticamente para o próximo nível de cobrança, sem exceção.'},
+  {icon:'⚖️',t:'Multa 2% + juros 1%/mês a partir de D+1',d:'Cobrar conforme contrato. Mencionar ao cobrar. É direito do escritório e pressiona o pagamento.'},
+  {icon:'🏛️',t:'Protesto automático em D+25',d:'Após 25 dias sem pagamento ou acordo, o título vai ao cartório. Sem consulta ao CEO, sem segunda chance.'},
+  {icon:'🚫',t:'Sem serviços para inadimplentes',d:'Nenhum serviço adicional para clientes com débito D+7 ou mais. Em D+10 suspenso, bloqueio total e imediato.'},
+];
+function renderRegras(){
+  document.getElementById('reglist').innerHTML=REGRAS.map(r=>`
+    <div class="ri"><div class="rico">${r.icon}</div><div><div class="rtit">${r.t}</div><div class="rdesc">${r.d}</div></div></div>`).join('');
+}
+
+// ── INIT ──
+loadPako(()=>{}); // pré-carrega pako para agilizar upload
+renderCadencia();renderObjecoes();renderChecklist();renderRegras();
+</script>
+</body>
+</html>
