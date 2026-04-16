@@ -531,14 +531,31 @@ function renderTable(){
   }).join('');
 }
 
+function getScriptsForDay(dm){
+  // Pega os 3 scripts do CAD que correspondem ao dia do cliente
+  const diasStr = 'D+'+dm;
+  const scripts = CAD.filter(s => s.dia === diasStr);
+  // Se não tiver 3 (ex: D+10, D+25, D+35 têm só 1), retorna o que tiver
+  if(scripts.length === 0){
+    // fallback: pega o mais próximo
+    const fallback = CAD.find(s => {
+      const n = parseInt(s.dia.replace('D+','').replace('D-',''));
+      return !isNaN(n) && n <= dm;
+    });
+    return fallback ? [fallback] : [];
+  }
+  return scripts;
+}
+
 function showDetail(idx){
   selectedIdx=idx;renderTable();
   const c=processedData[idx];const r=classify(c.dm);
-  const bLinks=bMap[idx]||[];const msg=r.msg(c,bLinks);
+  const scripts=getScriptsForDay(c.dm);
+  const bLinks=bMap[idx]||[];
+
   const multiInfo = c.parcelas&&c.parcelas.length>1
     ? `<div style="background:#2a1800;border:1px solid #854F0B;border-radius:var(--r);padding:8px 12px;margin-bottom:13px;font-size:12px;color:#fbbf24">
-        <b>Regra aplicada:</b> cliente tem ${c.parcelas.length} boletos em aberto. A classificacao usa o boleto mais antigo
-        (venc. ${c.dmVenc} — D+${c.dm}), conforme protocolo de protesto.
+        <b>Regra:</b> ${c.parcelas.length} boletos em aberto — classificado pelo mais antigo (venc. ${c.dmVenc} — D+${c.dm}).
        </div>` : '';
   const alrt=c.dm>=65?`<div class="dalert">Encaminhar para advogado imediatamente — debito ha mais de 65 dias.</div>`
     :c.dm>=35?`<div class="dalert" style="color:var(--purple);border-color:#4a1d95;background:#0f0818">Protesto em cartorio — executar urgentemente.</div>`:'';
@@ -576,6 +593,41 @@ function showDetail(idx){
       </div>
     </div>` : '';
 
+  // Construir bloco dos 3 scripts do dia
+  const TURNOS = ['☀️ 08h','🌤️ 13h','🌆 17h'];
+  const CORES_TURNO = ['#b7950b','#ca6f1e','#784212'];
+  const scriptBlocks = scripts.length > 0 ? `
+    <div style="margin-top:16px">
+      <div class="dbt" style="margin-bottom:10px">📱 SCRIPTS DO DIA — D+${c.dm} &nbsp;·&nbsp; <span style="color:var(--text3);font-weight:400;font-size:10px">Cole o(s) link(s) do boleto abaixo e copie cada mensagem no horário indicado</span></div>
+      ${buildBoletoInputs(idx,c)}
+      <div style="display:flex;flex-direction:column;gap:10px">
+        ${scripts.map((s,si)=>{
+          const turnoLabel = s.turno || TURNOS[si] || '';
+          const hora = turnoLabel.match(/\d{2}h/)?.[0] || '';
+          const emoji = turnoLabel.startsWith('☀️')?'☀️':turnoLabel.startsWith('🌤️')?'🌤️':turnoLabel.startsWith('🌆')?'🌆':'📱';
+          const corTurno = CORES_TURNO[si] || '#dc2626';
+          const msgText = s.s.replace(/\[COLE AQUI O LINK DO BOLETO\]/g, buildLinksMsg(c,bLinks).replace(/\n\n$/,'').replace('💰 Pague agora: ','').replace('💰 Quite agora para reativar: ','').replace('💰 Regularize agora: ','').replace('💰 Evite o protesto: ','').replace('💰 Quite agora: ','').replace('💰 Evite a suspensão: ','').replace('💰 Regularize: ','').replace('💰 Pague AGORA: ','').replace('💰 Link: ','').trim()||'[COLE O LINK DO BOLETO]');
+          const fullMsg = r.msg ? r.msg(c, bLinks) : s.s;
+          return `<div style="border:1px solid ${corTurno}40;border-left:3px solid ${corTurno};border-radius:0 var(--r) var(--r) 0;background:var(--bg3);overflow:hidden">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:${corTurno}15;border-bottom:1px solid ${corTurno}30">
+              <span style="font-size:18px">${emoji}</span>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:700;color:${corTurno}">${hora ? hora+' — ' : ''}${s.tipo||turnoLabel}</div>
+                <div style="font-size:11px;color:var(--text3)">📲 ${s.canal}</div>
+              </div>
+              <button class="btn" style="font-size:11px;padding:4px 10px" onclick="cpRaw(this,'smsg-${idx}-${si}')">Copiar ↗</button>
+            </div>
+            <div style="padding:12px 14px">
+              <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Ação obrigatória</div>
+              <div style="font-size:12px;color:${corTurno};font-weight:600;margin-bottom:10px;line-height:1.5">${s.acao}</div>
+              <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Mensagem</div>
+              <div id="smsg-${idx}-${si}" style="font-size:13px;color:var(--text2);font-style:italic;background:var(--bg);border-left:2px solid ${corTurno};padding:10px 13px;white-space:pre-wrap;line-height:1.75">${si===0?fullMsg:s.s}</div>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>` : `<div style="margin-top:16px">${buildBoletoInputs(idx,c)}<div class="smsg" id="sm-${idx}">${r.msg(c,bLinks)}</div><button class="btn cp-btn" onclick="cpMsg(${idx})">Copiar mensagem</button></div>`;
+
   document.getElementById('dpanel').innerHTML=`
     <div class="dp">
       <div class="dp-top">
@@ -586,27 +638,32 @@ function showDetail(idx){
       ${multiInfo}${alrt}
       <div class="dp-grid">
         <div class="dp-box">
-          <div class="dbt">Canal de contato</div><div class="dba" style="margin-bottom:12px">${r.canal}</div>
-          <div class="dbt">O que fazer agora</div><div class="dba" style="margin-bottom:14px">${r.acao}</div>
-          <div class="dbt">Parcelas em aberto${c.parcelas&&c.parcelas.length>1?' <span style="color:var(--amber);font-size:10px;font-weight:400">(★ = mais antiga — define a classificacao)</span>':''}</div>
+          <div class="dbt">Situação</div><div class="dba" style="margin-bottom:6px"><span class="bdg ${r.css}">${r.label}</span> · D+${c.dm}</div>
+          <div class="dbt" style="margin-top:10px">Canal do dia</div><div class="dba" style="margin-bottom:12px">${r.canal}</div>
+          <div class="dbt">Parcelas em aberto${c.parcelas&&c.parcelas.length>1?' <span style="color:var(--amber);font-size:10px;font-weight:400">(★ = mais antiga)</span>':''}</div>
           <div>${(c.parcelas||[]).sort((a,b)=>(b.dias||0)-(a.dias||0)).map(p=>{
             const isOldest=p.dias===c.dm;
             return`<div class="parc-row" style="${isOldest&&c.parcelas.length>1?'background:#2a1800;':''}">
               <span>${isOldest&&c.parcelas.length>1?'★ ':''}<b style="font-size:11px">${p.venc||'—'}</b></span>
-              <span style="color:${(p.dias||c.dm)>=35?'var(--red)':(p.dias||c.dm)>=20?'var(--amber)':'var(--text2)'}">R$ ${fmt(p.valor)} · D+${p.dias||c.dm}</span>
+              <span style="color:${(p.dias||c.dm)>=26?'var(--red)':(p.dias||c.dm)>=20?'var(--amber)':'var(--text2)'}">R$ ${fmt(p.valor)} · D+${p.dias||c.dm}</span>
             </div>`;
           }).join('')}</div>
           ${suspCheckList}
         </div>
-        <div class="dp-box">
-          <div class="dbt">Script de cobrança — WhatsApp</div>
-          ${buildBoletoInputs(idx,c)}
-          <div class="smsg" id="sm-${idx}">${msg}</div>
-          <button class="btn cp-btn" onclick="cpMsg(${idx})">Copiar mensagem</button>
+        <div class="dp-box" style="overflow:visible">
+          ${scriptBlocks}
         </div>
       </div>
     </div>`;
   document.getElementById('dpanel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function cpRaw(btn, elId){
+  const el=document.getElementById(elId);
+  if(!el)return;
+  navigator.clipboard.writeText(el.textContent||el.innerText).then(()=>{
+    btn.textContent='✓ Copiado!';setTimeout(()=>btn.textContent='Copiar ↗',2000);
+  });
 }
 
 function buildBoletoInputs(idx, c){
@@ -650,8 +707,12 @@ function updB(idx){
   const c=processedData[idx];if(!c)return;
   const r=classify(c.dm);
   bMap[idx]=getLinks(idx,c);
-  const el=document.getElementById('sm-'+idx);
+  // Atualiza o 1º script (que usa r.msg com links dinâmicos)
+  const el=document.getElementById('smsg-'+idx+'-0');
   if(el) el.textContent=r.msg(c,bMap[idx]);
+  // Atualiza campo legado se existir
+  const elLeg=document.getElementById('sm-'+idx);
+  if(elLeg) elLeg.textContent=r.msg(c,bMap[idx]);
 }
 
 function cpMsg(idx){
