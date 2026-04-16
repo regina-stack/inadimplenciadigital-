@@ -783,7 +783,9 @@ Qualquer dúvida, estamos à disposição!`},
   {dia:'D+3',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#ef4444',bg:'#200808',acao:'LIGAR. Pressionar por data concreta.',s:`[NOME], sua fatura já acumula multa e juros — R$ [VALOR+ENCARGOS] no total. Me dá uma data concreta de pagamento hoje?
 
 [Se pedir boleto → enviar pelo WhatsApp]`},
-  {dia:'D+3',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp final. Mencionar suspensão se não pagar até D+10.',s:`[NOME], 3º dia sem regularização (R$ [VALOR+ENCARGOS]). Sem pagamento ou acordo até o 10º dia os serviços serão suspensos.
+  {dia:'D+3',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp final. Mencionar suspensão se não pagar até D+10.',s:`[NOME], 3º dia sem regularização (R$ [VALOR+ENCARGOS]).
+
+⚠️ ATENÇÃO: sem pagamento ou acordo até o 10º dia, os serviços contábeis serão SUSPENSOS e as declarações fiscais (DAS, DCTF, SPED) NÃO serão entregues. As multas geradas são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
@@ -791,65 +793,135 @@ Qualquer dúvida, estamos à disposição!`},
   {dia:'D+4',turno:'☀️ 08h — 1º contato',tipo:'Ligação',canal:'Ligação',cor:'#ef4444',bg:'#200808',acao:'LIGAR como abertura do dia.',s:`[NOME], 4 dias em aberto. Estou ligando cedo para resolver antes de escalar. Tem condição de pagar hoje?
 
 [Se sim → enviar boleto pelo WhatsApp]`},
-  {dia:'D+4',turno:'🌤️ 13h — 2º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp da tarde. Reforçar urgência.',s:`[NOME], falta de retorno sobre R$ [VALOR+ENCARGOS]. Faltam 6 dias para a suspensão. Preciso de uma posição HOJE.
+  {dia:'D+4',turno:'🌤️ 13h — 2º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp da tarde. Reforçar urgência.',s:`[NOME], falta de retorno sobre R$ [VALOR+ENCARGOS]. Faltam 6 dias para a SUSPENSÃO dos serviços.
+
+⚠️ Com a suspensão, as declarações fiscais (DAS, DCTF, SPED) NÃO serão entregues e todas as multas por atraso são de RESPONSABILIDADE DA EMPRESA.
 
 💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+4',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp final do dia.',s:`[NOME], último contato do dia. Fatura de R$ [VALOR+ENCARGOS] em aberto há 4 dias. Me responda com data de pagamento ou comprovante.
+  {dia:'D+4',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp final do dia.',s:`[NOME], último contato do dia. Fatura de R$ [VALOR+ENCARGOS] em aberto há 4 dias.
+
+⚠️ Lembre-se: a suspensão dos serviços está a 6 dias. Com ela, declarações fiscais NÃO serão entregues e multas serão de responsabilidade da empresa.
+
+Me responda com data de pagamento ou comprovante.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   // D+5
-  {dia:'D+5',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'Alerta de metade do prazo.',s:`[NOME], hoje é o 5º dia — metade do prazo antes da suspensão. Débito: R$ [VALOR+ENCARGOS].
+  {dia:'D+5',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'Alerta de metade do prazo.',s:`[NOME], hoje é o 5º dia — METADE DO PRAZO antes da suspensão.
 
-💰 Regularize agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+5',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#dc2626',bg:'#1a0505',acao:'LIGAR. Exigir data ou proposta de acordo.',s:`[NOME], chegamos na metade do prazo. Sem pagamento ou acordo até o dia 10, serviços serão suspensos. O que você pode fazer hoje?
+⚠️ Se os serviços forem suspensos:
+• Declarações fiscais (DAS, DCTF, SPED) NÃO serão entregues
+• Multas e juros por não entrega são de RESPONSABILIDADE DA EMPRESA
+
+Débito: R$ [VALOR+ENCARGOS]. Regularize agora e evite esse risco.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+5',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#dc2626',bg:'#1a0505',acao:'LIGAR. Exigir data ou proposta de acordo.',s:`[NOME], chegamos na metade do prazo. Sem pagamento até o dia 10, os serviços serão SUSPENSOS.
+
+⚠️ Com a suspensão: declarações fiscais NÃO serão entregues e as multas fiscais serão de RESPONSABILIDADE DA EMPRESA — isso pode gerar autuação imediata.
+
+O que você pode fazer hoje?
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+5',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp final. Registrar.',s:`[NOME], encerrando o 5º dia sem regularização (R$ [VALOR+ENCARGOS]). Amanhã o prazo fica ainda mais crítico.
+  {dia:'D+5',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp final. Registrar.',s:`[NOME], encerrando o 5º dia sem regularização (R$ [VALOR+ENCARGOS]).
+
+⚠️ Faltam 5 dias para a suspensão dos serviços. A partir da suspensão, declarações fiscais NÃO serão entregues e todas as multas por atraso serão de RESPONSABILIDADE DA EMPRESA.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   // D+6
-  {dia:'D+6',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp — 4 dias para suspensão.',s:`[NOME], faltam 4 dias para a SUSPENSÃO dos serviços. Débito: R$ [VALOR+ENCARGOS]. Preciso de resposta HOJE.
+  {dia:'D+6',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp — 4 dias para suspensão.',s:`[NOME], faltam 4 dias para a SUSPENSÃO DOS SERVIÇOS.
 
-💰 Regularize: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+6',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#dc2626',bg:'#1a0505',acao:'LIGAR. Última tentativa de acordo amigável.',s:`[NOME], 4 dias para a suspensão. Se tiver dificuldade financeira, podemos conversar sobre um acordo. Mas preciso de resposta hoje.
+⛔ Com a suspensão, NÃO serão entregues:
+• DAS, DCTF, SPED, ECF, ECD
+• Guias, balancetes e certidões
+
+⚠️ Todas as multas e juros por não entrega serão de EXCLUSIVA RESPONSABILIDADE DA EMPRESA, conforme contrato.
+
+Débito: R$ [VALOR+ENCARGOS]. Preciso de resposta HOJE.
+
+💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+6',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#dc2626',bg:'#1a0505',acao:'LIGAR. Última tentativa de acordo amigável.',s:`[NOME], 4 dias para a suspensão dos serviços. Se ocorrer, declarações fiscais NÃO serão entregues e as multas são de responsabilidade da empresa.
+
+Se tiver dificuldade financeira, podemos conversar sobre um acordo. Mas preciso de resposta hoje.
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+6',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp final.',s:`[NOME], 3 dias restantes antes da suspensão. R$ [VALOR+ENCARGOS] sem regularização. Amanhã intensificamos.
+  {dia:'D+6',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp final.',s:`[NOME], 3 dias restantes antes da SUSPENSÃO.
+
+⚠️ Com a suspensão: DAS, DCTF e todas as obrigações NÃO serão entregues. Multas fiscais são de RESPONSABILIDADE DA EMPRESA.
+
+R$ [VALOR+ENCARGOS] sem regularização. Amanhã intensificamos.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   // D+7
-  {dia:'D+7',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp — Notificação',canal:'WhatsApp',cor:'#b91c1c',bg:'#180404',acao:'WhatsApp formal de notificação oficial.',s:`[NOME], NOTIFICAÇÃO: débito de R$ [VALOR+ENCARGOS] há 7 dias. SUSPENSÃO em 3 dias sem regularização ou acordo.
+  {dia:'D+7',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp — Notificação',canal:'WhatsApp',cor:'#b91c1c',bg:'#180404',acao:'WhatsApp formal de notificação oficial.',s:`[NOME], NOTIFICAÇÃO FORMAL: débito de R$ [VALOR+ENCARGOS] há 7 dias.
+
+⛔ Em 3 dias os serviços serão SUSPENSOS. A partir da suspensão:
+• Declarações fiscais (DAS, DCTF, SPED) NÃO serão entregues
+• Multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA
 
 💰 Evite a suspensão: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+7',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#b91c1c',bg:'#180404',acao:'LIGAR obrigatoriamente. Registrar resposta.',s:`[NOME], estou ligando para formalizar: faltam 3 dias para a suspensão. Tem condição de regularizar hoje ou quer propor um acordo formal?
+  {dia:'D+7',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#b91c1c',bg:'#180404',acao:'LIGAR obrigatoriamente. Registrar resposta.',s:`[NOME], estou ligando para formalizar: faltam 3 dias para a SUSPENSÃO DOS SERVIÇOS.
+
+⚠️ Com a suspensão, as declarações fiscais NÃO serão entregues e as multas fiscais serão de RESPONSABILIDADE DA EMPRESA. Isso pode gerar autuação imediata pela Receita.
+
+Tem condição de regularizar hoje ou quer propor um acordo formal?
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+7',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#b91c1c',bg:'#180404',acao:'WhatsApp final. Último alerta antes dos 2 dias finais.',s:`[NOME], encerrando o 7º dia. Restam 3 dias. Amanhã e depois são os últimos contatos antes da suspensão automática.
+  {dia:'D+7',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#b91c1c',bg:'#180404',acao:'WhatsApp final. Último alerta antes dos 2 dias finais.',s:`[NOME], encerrando o 7º dia. Restam 3 dias antes da SUSPENSÃO AUTOMÁTICA.
+
+⚠️ Lembre-se: com a suspensão, declarações fiscais NÃO serão entregues e todas as multas são de RESPONSABILIDADE DA EMPRESA.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   // D+8
-  {dia:'D+8',turno:'☀️ 08h — 1º contato',tipo:'Ligação',canal:'Ligação',cor:'#991b1b',bg:'#160303',acao:'LIGAR logo cedo. Tom definitivo. 2 dias restantes.',s:`[NOME], ligo cedo porque faltam 2 dias para a suspensão. Ainda tenho autorização para negociar hoje. Consegue resolver agora?
+  {dia:'D+8',turno:'☀️ 08h — 1º contato',tipo:'Ligação',canal:'Ligação',cor:'#991b1b',bg:'#160303',acao:'LIGAR logo cedo. Tom definitivo. 2 dias restantes.',s:`[NOME], ligo cedo porque faltam 2 dias para a SUSPENSÃO DOS SERVIÇOS.
+
+⚠️ Com a suspensão: DAS, DCTF, SPED e demais declarações NÃO serão entregues. As multas fiscais por não entrega são de RESPONSABILIDADE DA EMPRESA.
+
+Ainda tenho autorização para negociar hoje. Consegue resolver agora?
 
 [Se aceitar → enviar boleto pelo WhatsApp]`},
-  {dia:'D+8',turno:'🌤️ 13h — 2º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#991b1b',bg:'#160303',acao:'WhatsApp da tarde. Urgência máxima.',s:`[NOME], 2 dias para a suspensão. R$ [VALOR+ENCARGOS]. Esta é uma das últimas oportunidades antes do bloqueio dos serviços.
+  {dia:'D+8',turno:'🌤️ 13h — 2º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#991b1b',bg:'#160303',acao:'WhatsApp da tarde. Urgência máxima.',s:`[NOME], 2 dias para a SUSPENSÃO DOS SERVIÇOS.
+
+⛔ Com o bloqueio: DAS, DCTF, SPED NÃO serão entregues e as multas fiscais serão de EXCLUSIVA RESPONSABILIDADE DA EMPRESA.
+
+R$ [VALOR+ENCARGOS]. Esta é uma das últimas oportunidades.
 
 💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+8',turno:'🌆 17h — 3º contato',tipo:'Ligação',canal:'Ligação',cor:'#991b1b',bg:'#160303',acao:'LIGAR no fim do dia. Deixar recado se não atender.',s:`[NOME], última ligação do dia. Restam 2 dias para suspensão. Me retorne hoje ainda ou amanhã cedo.
+  {dia:'D+8',turno:'🌆 17h — 3º contato',tipo:'Ligação',canal:'Ligação',cor:'#991b1b',bg:'#160303',acao:'LIGAR no fim do dia. Deixar recado se não atender.',s:`[NOME], última ligação do dia. Restam 2 dias para a SUSPENSÃO.
+
+⚠️ Com a suspensão: declarações fiscais NÃO serão entregues e multas fiscais são de RESPONSABILIDADE DA EMPRESA.
+
+Me retorne hoje ainda ou amanhã cedo.
 
 [Se aceitar → propor acordo imediato]`},
 
   // D+9 — ÚLTIMO DIA
-  {dia:'D+9',turno:'☀️ 08h — URGENTE',tipo:'ÚLTIMO DIA — 1º contato',canal:'WhatsApp + Ligação',cor:'#7f1d1d',bg:'#120202',acao:'WhatsApp E ligar na sequência. Registrar horário.',s:`[NOME], ATENÇÃO: AMANHÃ seus serviços serão SUSPENSOS (R$ [VALOR+ENCARGOS]). Última oportunidade.
+  {dia:'D+9',turno:'☀️ 08h — URGENTE',tipo:'ÚLTIMO DIA — 1º contato',canal:'WhatsApp + Ligação',cor:'#7f1d1d',bg:'#120202',acao:'WhatsApp E ligar na sequência. Registrar horário.',s:`[NOME], ATENÇÃO: AMANHÃ seus serviços serão SUSPENSOS.
+
+⛔ A partir de amanhã NÃO serão entregues:
+• Declarações fiscais (DAS, DCTF, SPED, ECF, ECD)
+• Obrigações acessórias e guias
+
+⚠️ TODAS as multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA, conforme contrato.
+
+Débito: R$ [VALOR+ENCARGOS]. Última oportunidade.
 
 💰 Pague AGORA: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+9',turno:'🌤️ 13h — 2º contato',tipo:'ÚLTIMO DIA — Ligação',canal:'Ligação',cor:'#7f1d1d',bg:'#120202',acao:'LIGAR. Se não atender, deixar recado detalhado.',s:`[NOME], ligo pela segunda vez hoje. É o último dia. Preciso de pagamento, comprovante ou proposta de acordo formal agora.
+  {dia:'D+9',turno:'🌤️ 13h — 2º contato',tipo:'ÚLTIMO DIA — Ligação',canal:'Ligação',cor:'#7f1d1d',bg:'#120202',acao:'LIGAR. Se não atender, deixar recado detalhado.',s:`[NOME], ligo pela segunda vez hoje. É o ÚLTIMO DIA antes da suspensão.
+
+⚠️ Amanhã: declarações fiscais NÃO serão entregues e multas são de RESPONSABILIDADE DA EMPRESA. Não deixe isso acontecer.
+
+Preciso de pagamento, comprovante ou proposta de acordo formal agora.
 
 [Se aceitar → enviar boleto pelo WhatsApp imediatamente]`},
-  {dia:'D+9',turno:'🌆 17h — CONTATO FINAL',tipo:'ÚLTIMO DIA — 3º contato',canal:'WhatsApp + Ligação',cor:'#7f1d1d',bg:'#120202',acao:'LIGAR e WhatsApp simultâneos. Último contato antes da suspensão.',s:`[NOME], ÚLTIMO AVISO: amanhã os serviços serão suspensos às 08h. Entre em contato AGORA, mesmo para propor um acordo.
+  {dia:'D+9',turno:'🌆 17h — CONTATO FINAL',tipo:'ÚLTIMO DIA — 3º contato',canal:'WhatsApp + Ligação',cor:'#7f1d1d',bg:'#120202',acao:'LIGAR e WhatsApp simultâneos. Último contato antes da suspensão.',s:`[NOME], ÚLTIMO AVISO: amanhã às 08h os serviços serão SUSPENSOS.
+
+⛔ Com a suspensão: DAS, DCTF e todas as declarações NÃO serão entregues. Multas fiscais são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA.
+
+Entre em contato AGORA, mesmo para propor um acordo.
 
 💰 Pague agora e cancele a suspensão: [COLE AQUI O LINK DO BOLETO]`},
 
@@ -882,44 +954,70 @@ Qualquer dúvida, estamos à disposição!`},
   {dia:'D+11',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Citar obrigações que vencem esta semana.',s:`[NOME], 1 dia suspenso. DAS, DCTF e obrigações não serão entregues. Multas automáticas de responsabilidade da empresa.
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+11',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp final do dia.',s:`[NOME], 1 dia suspenso. Cada dia aumenta o risco fiscal. Me chame a qualquer momento.
+  {dia:'D+11',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp final do dia.',s:`[NOME], 1 dia suspenso. Seus serviços contábeis estão BLOQUEADOS.
+
+⛔ Cada dia sem regularização: declarações fiscais NÃO são entregues e multas fiscais acumulam — são de RESPONSABILIDADE DA EMPRESA.
+
+Me chame a qualquer momento.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   {dia:'D+12',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR cedo. Citar obrigação fiscal específica.',s:`[NOME], 2 dias suspenso. DAS do mês não será entregue — multa automática de responsabilidade da empresa. Vamos resolver hoje?
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+12',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp da tarde.',s:`[NOME], 2 dias sem cobertura contábil. Obrigações em atraso. Multas são de sua responsabilidade.
+  {dia:'D+12',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp da tarde.',s:`[NOME], 2 dias sem cobertura contábil.
 
-💰 Regularize: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+12',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp final.',s:`[NOME], encerrando o 2º dia suspenso. Ainda há tempo antes das multas se acumularem. Me contate agora.
+⛔ Serviços SUSPENSOS. Declarações fiscais (DAS, DCTF, SPED) NÃO estão sendo entregues.
+⚠️ Multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA — isso pode gerar autuação fiscal imediata.
+
+💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+12',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp final.',s:`[NOME], encerrando o 2º dia suspenso. Serviços BLOQUEADOS e declarações NÃO estão sendo entregues.
+
+⚠️ Cada dia que passa, mais multas fiscais se acumulam — todas de RESPONSABILIDADE DA EMPRESA.
+
+Me contate agora antes que o valor aumente mais.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
-  {dia:'D+13',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp. Começar a mencionar protesto.',s:`[NOME], 3 dias suspenso. Débito: R$ [VALOR]. Declarações não entregues. Em breve: protesto em cartório.
+  {dia:'D+13',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp. Começar a mencionar protesto.',s:`[NOME], 3 dias com serviços SUSPENSOS.
 
-💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+⛔ Declarações fiscais (DAS, DCTF, SPED) NÃO estão sendo entregues.
+⚠️ Multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA.
+
+Além disso, o débito de R$ [VALOR] será encaminhado para PROTESTO EM CARTÓRIO em breve.
+
+💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
   {dia:'D+13',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR. Tentar pagamento parcial.',s:`[NOME], 3 dias suspenso. Você tem condição de pagar ao menos parte hoje? Qualquer valor reduz o débito antes do protesto.
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+13',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp final.',s:`[NOME], 3º dia suspenso encerrado. O protesto está se aproximando. Me contate amanhã pela manhã.
+  {dia:'D+13',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp final.',s:`[NOME], 3º dia suspenso encerrado. Serviços BLOQUEADOS e declarações fiscais NÃO estão sendo entregues — multas de RESPONSABILIDADE DA EMPRESA.
+
+O protesto em cartório está se aproximando. Me contate amanhã pela manhã.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   {dia:'D+14',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR cedo. 2 semanas de débito.',s:`[NOME], 14 dias de débito e 4 suspenso. Situação crítica. Tem como resolver hoje?
 
 [Se aceitar → enviar boleto pelo WhatsApp]`},
-  {dia:'D+14',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp da tarde. Escalada iminente.',s:`[NOME], 2 semanas em aberto. Poucos dias para o aviso formal de protesto. Ainda tenho autorização para negociar.
+  {dia:'D+14',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp da tarde. Escalada iminente.',s:`[NOME], 2 semanas em aberto e serviços SUSPENSOS.
+
+⛔ Declarações fiscais NÃO estão sendo entregues. Multas fiscais são de RESPONSABILIDADE DA EMPRESA.
+
+Estamos a poucos dias do aviso formal de protesto. Ainda tenho autorização para negociar.
 
 💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+14',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR. Última tentativa antes do aviso de protesto.',s:`[NOME], última ligação do dia. Amanhã o caso entra na fase de aviso de protesto. Ainda podemos resolver.
+  {dia:'D+14',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR. Última tentativa antes do aviso de protesto.',s:`[NOME], última ligação do dia. Serviços SUSPENSOS, declarações NÃO estão sendo entregues e multas são de RESPONSABILIDADE DA EMPRESA.
+
+Amanhã o caso entra na fase de aviso de protesto. Ainda podemos resolver.
 
 [Se aceitar → enviar boleto]`},
 
   // D+15 a D+19 — PRÉ-PROTESTO (3x/dia)
-  {dia:'D+15',turno:'☀️ 08h — 1º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp — protesto em 5 dias.',s:`[NOME], 15 dias em aberto. Em 5 dias o título vai para PROTESTO EM CARTÓRIO e CNPJ será negativado no SERASA/SPC.
+  {dia:'D+15',turno:'☀️ 08h — 1º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp — protesto em 5 dias.',s:`[NOME], 15 dias em aberto. Serviços SUSPENSOS e declarações fiscais NÃO estão sendo entregues — multas de RESPONSABILIDADE DA EMPRESA.
 
-💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+⚠️ Em 5 dias o título vai para PROTESTO EM CARTÓRIO e CNPJ será negativado no SERASA/SPC.
+
+💰 Evite o protesto e reative seus serviços: [COLE AQUI O LINK DO BOLETO]`},
   {dia:'D+15',turno:'🌤️ 13h — 2º contato',tipo:'Pré-protesto',canal:'Ligação',cor:'#a855f7',bg:'#0d0620',acao:'LIGAR. Explicar consequências do protesto.',s:`[NOME], em 5 dias o título vai a cartório. Protesto aparece no Diário Oficial, restringe crédito e certidões do CNPJ. Ainda posso segurar.
 
 [Se aceitar → enviar boleto]`},
@@ -968,18 +1066,32 @@ Qualquer dúvida, estamos à disposição!`},
 💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
 
   // D+20 AVISO DE PROTESTO (3 contatos)
-  {dia:'D+20',turno:'☀️ 08h — AVISO FORMAL',tipo:'⚠️ Aviso de Protesto',canal:'WhatsApp + Ligação',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp formal + LIGAR após. Registrar. Aguardar 5 dias para executar.',s:`[NOME], comunicamos formalmente que o débito de R$ [VALOR] em aberto há 20 dias será encaminhado para PROTESTO EM CARTÓRIO em 5 dias úteis, com negativação no SERASA/SPC.
+  {dia:'D+20',turno:'☀️ 08h — AVISO FORMAL',tipo:'⚠️ Aviso de Protesto',canal:'WhatsApp + Ligação',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp formal + LIGAR após. Registrar. Aguardar 5 dias para executar.',s:`[NOME], comunicamos formalmente:
 
-💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+20',turno:'🌤️ 13h — 2º contato',tipo:'⚠️ Reforço do aviso',canal:'Ligação',cor:'#fff',bg:'#4c1d95',acao:'LIGAR para confirmar recebimento do aviso.',s:`[NOME], estou ligando para confirmar o recebimento do aviso de protesto enviado esta manhã. Recebeu? Ainda temos 5 dias para resolver sem o protesto.
+⛔ Seus serviços contábeis estão SUSPENSOS. Declarações fiscais (DAS, DCTF, SPED) NÃO estão sendo entregues. Multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA.
+
+⚠️ O débito de R$ [VALOR] será encaminhado para PROTESTO EM CARTÓRIO em 5 dias úteis, com negativação no SERASA/SPC.
+
+💰 Regularize agora e evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+20',turno:'🌤️ 13h — 2º contato',tipo:'⚠️ Reforço do aviso',canal:'Ligação',cor:'#fff',bg:'#4c1d95',acao:'LIGAR para confirmar recebimento do aviso.',s:`[NOME], estou ligando para confirmar o aviso de protesto enviado esta manhã.
+
+⚠️ Lembre-se: serviços SUSPENSOS, declarações fiscais NÃO estão sendo entregues e as multas são de RESPONSABILIDADE DA EMPRESA. O protesto em cartório é em 5 dias. Ainda dá tempo de resolver.
 
 [Se aceitar → enviar boleto]`},
-  {dia:'D+20',turno:'🌆 17h — 3º contato',tipo:'⚠️ Último contato do dia',canal:'WhatsApp',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp final. Registrar.',s:`[NOME], encerrando o dia do aviso formal. Faltam 4 dias para a execução do protesto. Regularize o quanto antes.
+  {dia:'D+20',turno:'🌆 17h — 3º contato',tipo:'⚠️ Último contato do dia',canal:'WhatsApp',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp final. Registrar.',s:`[NOME], encerrando o dia. Serviços SUSPENSOS, declarações fiscais NÃO estão sendo entregues e multas são de RESPONSABILIDADE DA EMPRESA.
+
+Faltam 4 dias para o PROTESTO EM CARTÓRIO. Regularize o quanto antes.
 
 💰 Link: [COLE AQUI O LINK DO BOLETO]`},
 
   // D+25 PROTESTO
-  {dia:'D+25',turno:'☀️ 08h — EXECUTAR',tipo:'🟣 Protesto em Cartório',canal:'Cartório + SERASA + WhatsApp',cor:'#fff',bg:'#3b0764',acao:'Levar título ao cartório. Negativar SERASA/SPC. Comunicar cliente. Informar CEO.',s:`[NOME], o título referente ao débito de R$ [VALOR] foi encaminhado para PROTESTO EM CARTÓRIO hoje. CNPJ sendo negativado no SERASA/SPC. Para cancelamento: quitação integral + custas cartorárias.
+  {dia:'D+25',turno:'☀️ 08h — EXECUTAR',tipo:'🟣 Protesto em Cartório',canal:'Cartório + SERASA + WhatsApp',cor:'#fff',bg:'#3b0764',acao:'Levar título ao cartório. Negativar SERASA/SPC. Comunicar cliente. Informar CEO.',s:`[NOME], informamos:
+
+⛔ Seus serviços contábeis estão SUSPENSOS. Declarações fiscais (DAS, DCTF, SPED) NÃO estão sendo entregues. Multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA.
+
+🏛️ O título de R$ [VALOR] foi encaminhado para PROTESTO EM CARTÓRIO hoje. Seu CNPJ está sendo negativado no SERASA/SPC.
+
+Para cancelamento do protesto e reativação dos serviços: quitação integral + custas cartorárias.
 
 💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
 
