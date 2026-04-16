@@ -162,19 +162,45 @@ tr:last-child td{border-bottom:none}.clk{cursor:pointer}.clk:hover td{background
 function go(id,el){document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));document.getElementById('page-'+id).classList.add('on');el.classList.add('on')}
 
 const RC=[
-  {key:'low',label:'Atraso leve',min:1,max:9,css:'low',canal:'WhatsApp',acao:'WhatsApp solicitando posição. Se sem resposta em 2h, ligar.',
-   msg:(c,b)=>`Olá! Sua fatura está em aberto há ${c.dm} dia(s), no valor de R$ ${fmt(c.total)}. Caso já tenha pago, nos envie o comprovante.\n\n💰 Pague agora: ${b||'[COLE AQUI O LINK DO BOLETO]'} 🙏`},
-  {key:'mid',label:'Atenção',min:10,max:19,css:'mid',canal:'WhatsApp + Ligação',acao:'LIGAR obrigatoriamente após WhatsApp. Exigir data concreta hoje.',
-   msg:(c,b)=>`Sua fatura de R$ ${fmt(c.total)} está em aberto há ${c.dm} dias. Já incidem multa de 2% e juros de 1%/mês. Preciso de uma posição HOJE.\n\n💰 Pague agora: ${b||'[COLE AQUI O LINK DO BOLETO]'} ☎️`},
-  {key:'sus',label:'Suspenso',min:20,max:34,css:'sus',canal:'WhatsApp + Ligação',acao:'Serviços suspensos. Cobrar diariamente. Mencionar multas fiscais.',
-   msg:(c,b)=>`Seus serviços contábeis estão SUSPENSOS há ${c.dm-10} dia(s). Débito: R$ ${fmt(c.total)}. Empresa sem cobertura contábil — multas fiscais automáticas.\n\n💰 Quite agora para reativar: ${b||'[COLE AQUI O LINK DO BOLETO]'} ☎️`},
-  {key:'prot',label:'Protesto iminente',min:35,max:64,css:'prot',canal:'WhatsApp + Ligação',acao:'Avisar sobre protesto em cartório e negativação SERASA/SPC.',
-   msg:(c,b)=>`Seu débito de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Título vai para PROTESTO EM CARTÓRIO e CNPJ negativado no SERASA/SPC.\n\n💰 Evite o protesto: ${b||'[COLE AQUI O LINK DO BOLETO]'}`},
-  {key:'crit',label:'Jurídico',min:65,max:9999,css:'crit',canal:'Advogado',acao:'Encaminhar para advogado. Enviar toda documentação.',
-   msg:(c,b)=>`Notificação formal: débito de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Título protestado, CNPJ negativado. Prazo: 5 dias úteis antes de ação judicial.\n\n💰 Regularização: ${b||'[COLE AQUI O LINK DO BOLETO]'}`},
+  {key:'low',  label:'Atraso leve',       min:1,  max:9,   css:'low',  canal:'WhatsApp',           acao:'WhatsApp solicitando posição. Se sem resposta em 2h, ligar.',
+   msg:(c,bs)=>`Olá! Sua fatura está em aberto há ${c.dm} dia(s), totalizando R$ ${fmt(c.total)}. Caso já tenha pago, nos envie o comprovante.\n\n${buildLinksMsg(c,bs)}🙏`},
+  {key:'mid',  label:'Atenção',            min:10, max:19,  css:'mid',  canal:'WhatsApp + Ligação', acao:'LIGAR obrigatoriamente após WhatsApp. Exigir data concreta hoje.',
+   msg:(c,bs)=>`Sua fatura de R$ ${fmt(c.total)} está em aberto há ${c.dm} dias. Já incidem multa de 2% e juros de 1%/mês. Preciso de uma posição HOJE.\n\n${buildLinksMsg(c,bs)}☎️`},
+  {key:'sus',  label:'Suspenso',           min:20, max:25,  css:'sus',  canal:'WhatsApp + Ligação', acao:'Serviços suspensos. Cobrar diariamente. Mencionar multas fiscais.',
+   msg:(c,bs)=>`Seus serviços contábeis estão SUSPENSOS há ${c.dm-10} dia(s). Total em aberto: R$ ${fmt(c.total)}. Empresa sem cobertura contábil — multas fiscais automáticas.\n\n${buildLinksMsg(c,bs)}☎️`},
+  {key:'prot', label:'Protesto iminente',  min:20, max:25,  css:'prot', canal:'WhatsApp + Ligação', acao:'Avisar sobre protesto em cartório em breve. LIGAR hoje.',
+   msg:(c,bs)=>`Seu débito total de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Em breve o título será encaminhado para PROTESTO EM CARTÓRIO e CNPJ negativado no SERASA/SPC.\n\n${buildLinksMsg(c,bs)}`},
+  {key:'prot', label:'Protesto iminente',  min:20, max:25,  css:'prot', canal:'WhatsApp + Ligação', acao:'Aviso formal de protesto. 5 dias para regularizar.',
+   msg:(c,bs)=>`Seu débito total de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Em breve o título será encaminhado para PROTESTO EM CARTÓRIO e CNPJ negativado no SERASA/SPC.\n\n${buildLinksMsg(c,bs)}`},
+  {key:'crit', label:'Jurídico',           min:65, max:9999,css:'crit', canal:'Advogado',           acao:'Encaminhar para advogado. Enviar toda documentação.',
+   msg:(c,bs)=>`Notificação formal: débito de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Título protestado, CNPJ negativado. Prazo: 5 dias úteis antes de ação judicial.\n\n${buildLinksMsg(c,bs)}`},
 ];
 
-function classify(d){for(let r of RC)if(d>=r.min&&d<=r.max)return r;return RC[0]}
+// Classificação corrigida: D+20–D+25 = protesto iminente, D+26+ = protestado/jurídico
+function classify(d){
+  if(d>=1  && d<=9)   return {key:'low',  label:'Atraso leve',      min:1,  max:9,   css:'low',  canal:'WhatsApp',           acao:'WhatsApp solicitando posição. Se sem resposta em 2h, ligar.',                                msg:RC[0].msg};
+  if(d>=10 && d<=19)  return {key:'mid',  label:'Atenção',           min:10, max:19,  css:'mid',  canal:'WhatsApp + Ligação', acao:'LIGAR obrigatoriamente após WhatsApp. Exigir data concreta hoje.',                           msg:RC[1].msg};
+  if(d>=20 && d<=25)  return {key:'prot', label:'Protesto iminente', min:20, max:25,  css:'prot', canal:'WhatsApp + Ligação', acao:'Aviso formal de protesto. 5 dias para regularizar. LIGAR hoje.',                             msg:(c,bs)=>`Seu débito total de R$ ${fmt(c.total)} em aberto há ${c.dm} dias. Em ${25-d<=0?'breve':(25-d)+' dia(s)'} o título vai para PROTESTO EM CARTÓRIO e CNPJ negativado no SERASA/SPC.\n\n${buildLinksMsg(c,bs)}`};
+  if(d>=26 && d<=64)  return {key:'prot2',label:'Protestado',        min:26, max:64,  css:'prot', canal:'Cartório + WhatsApp',acao:'Título em cartório. Comunicar cliente. Negativação SERASA/SPC ativa.',                       msg:(c,bs)=>`Informamos que o(s) título(s) referente(s) ao débito de R$ ${fmt(c.total)} já foram encaminhados para PROTESTO EM CARTÓRIO. Seu CNPJ está negativado no SERASA/SPC. Para cancelamento: quitação integral + custas cartorárias.\n\n${buildLinksMsg(c,bs)}`};
+  if(d>=65)           return {key:'crit', label:'Jurídico',          min:65, max:9999,css:'crit', canal:'Advogado',           acao:'Encaminhar para advogado. Enviar documentação completa.',                                    msg:RC[5].msg};
+  return {key:'low',label:'Atraso leve',min:1,max:9,css:'low',canal:'WhatsApp',acao:'WhatsApp solicitando posição.',msg:RC[0].msg};
+}
+
+// Gera bloco de links — 1 por parcela quando há múltiplos boletos
+function buildLinksMsg(c, bsMap){
+  const parcelas = c.parcelas||[];
+  if(parcelas.length<=1){
+    const link = (bsMap&&bsMap[0])||'[COLE AQUI O LINK DO BOLETO]';
+    return `💰 Pague agora: ${link}\n\n`;
+  }
+  // Múltiplos boletos — listar cada um
+  let lines = `💰 Boletos em aberto (${parcelas.length}):\n`;
+  parcelas.slice().sort((a,b)=>(b.dias||0)-(a.dias||0)).forEach((p,i)=>{
+    const link = (bsMap&&bsMap[i])||`[LINK DO BOLETO ${i+1}]`;
+    lines += `  ${i+1}. Venc. ${p.venc||'—'} · R$ ${fmt(p.valor)} → ${link}\n`;
+  });
+  return lines+'\n';
+}
 function fmt(v){return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2})}
 
 // ── PARSER — detecta formato e orienta corretamente ──
@@ -322,6 +348,7 @@ function splitCSVLine(line,sep){
 
 // ── UPLOAD ──
 let rawRows=[],processedData=[],selectedIdx=null;
+// bMap[idx] = array de links, um por parcela (ordenadas por mais antigas primeiro)
 const bMap={};
 const uz=document.getElementById('uzone'),fi=document.getElementById('finput');
 uz.addEventListener('click',()=>fi.click());
@@ -443,11 +470,16 @@ function processData(){
     const valorRaw=String(row[vC]||'0').replace(/[R$\s]/g,'').replace(/\./g,'').replace(',','.');
     const valor=Math.round((parseFloat(valorRaw)||0)*100)/100;
     if(valor<=0) return;
-    if(!clients[nome]) clients[nome]={nome,dm:0,total:0,parcelas:[]};
+    if(!clients[nome]) clients[nome]={nome,dm:0,total:0,parcelas:[],dmVenc:'',dmQtd:0};
     const venc=String(row[dC]||'').trim();
     clients[nome].parcelas.push({venc,dias,valor});
     clients[nome].total=Math.round((clients[nome].total+valor)*100)/100;
-    if(dias>clients[nome].dm) clients[nome].dm=dias;
+    clients[nome].dmQtd++;
+    // REGRA: classificação sempre pelo boleto MAIS ANTIGO (maior dias)
+    if(dias>clients[nome].dm){
+      clients[nome].dm=dias;
+      clients[nome].dmVenc=venc; // data do boleto mais antigo
+    }
   });
   processedData=Object.values(clients).filter(c=>c.total>0).sort((a,b)=>b.dm-a.dm);
   if(!processedData.length){
@@ -486,8 +518,12 @@ function renderTable(){
   if(!rows.length){tb.innerHTML=`<tr><td colspan="6" style="padding:2rem;text-align:center;color:var(--text3)">Nenhum cliente encontrado.</td></tr>`;return}
   tb.innerHTML=rows.map(c=>{
     const r=classify(c.dm);const idx=processedData.indexOf(c);
+    const multiTag=c.parcelas&&c.parcelas.length>1
+      ?`<span style="font-size:10px;background:#2a1800;color:#fbbf24;padding:1px 5px;border-radius:10px;margin-left:4px" title="Classificado pelo boleto mais antigo: venc. ${c.dmVenc}">${c.parcelas.length}x</span>`:'';
     return `<tr class="clk ${selectedIdx===idx?'sel':''}" onclick="showDetail(${idx})">
-      <td title="${c.nome}">${c.nome}</td><td>D+${c.dm}</td><td>R$ ${fmt(c.total)}</td>
+      <td title="${c.nome}">${c.nome}${multiTag}</td>
+      <td>D+${c.dm}${c.dmVenc?`<div style="font-size:10px;color:var(--text3)">venc.${c.dmVenc}</div>`:''}</td>
+      <td>R$ ${fmt(c.total)}</td>
       <td><span class="bdg ${r.css}">${r.label}</span></td>
       <td style="font-size:12px">${r.canal}</td>
       <td style="font-size:12px">${r.acao.substring(0,50)}${r.acao.length>50?'…':''}</td>
@@ -498,39 +534,44 @@ function renderTable(){
 function showDetail(idx){
   selectedIdx=idx;renderTable();
   const c=processedData[idx];const r=classify(c.dm);
-  const boleto=bMap[idx]||'';const msg=r.msg(c,boleto);
-  const alrt=c.dm>=65?`<div class="dalert">⚠️ Encaminhar para advogado imediatamente — débito há mais de 65 dias.</div>`
-    :c.dm>=35?`<div class="dalert" style="color:var(--purple);border-color:#4a1d95;background:#0f0818">⚠️ Protesto em cartório — executar urgentemente.</div>`:'';
+  const bLinks=bMap[idx]||[];const msg=r.msg(c,bLinks);
+  const multiInfo = c.parcelas&&c.parcelas.length>1
+    ? `<div style="background:#2a1800;border:1px solid #854F0B;border-radius:var(--r);padding:8px 12px;margin-bottom:13px;font-size:12px;color:#fbbf24">
+        <b>Regra aplicada:</b> cliente tem ${c.parcelas.length} boletos em aberto. A classificacao usa o boleto mais antigo
+        (venc. ${c.dmVenc} — D+${c.dm}), conforme protocolo de protesto.
+       </div>` : '';
+  const alrt=c.dm>=65?`<div class="dalert">Encaminhar para advogado imediatamente — debito ha mais de 65 dias.</div>`
+    :c.dm>=35?`<div class="dalert" style="color:var(--purple);border-color:#4a1d95;background:#0f0818">Protesto em cartorio — executar urgentemente.</div>`:'';
   const suspCheckList = (c.dm >= 10) ? `
     <div style="background:var(--red-bg);border:1px solid var(--red2);border-radius:var(--r);padding:16px;margin-top:14px">
-      <div class="dbt" style="color:var(--red);margin-bottom:12px">🔴 CHECKLIST DE SUSPENSÃO — ZappyContábil + Acessórias</div>
-      <div style="display:flex;flex-direction:column;gap:7px" id="sus-chk-${idx}">
-        ${['① ZappyContábil → adicionar tag <b>SUSPENSO</b>',
-           '② ZappyContábil → renomear para: <b>(SUSPENSO) '+c.nome+'</b>',
-           '③ Acessórias → <b>INATIVAR</b> acesso do cliente',
-           '④ Painel de clientes suspensos → <b>INCLUIR</b> o cliente',
-           '⑤ WhatsApp de suspensão enviado',
-           '⑥ Data/hora da suspensão registrada no sistema',
-           '⑦ CEO informado'].map((item,ii)=>`
+      <div class="dbt" style="color:var(--red);margin-bottom:12px">CHECKLIST DE SUSPENSAO — ZappyContabil + Acessorias</div>
+      <div style="display:flex;flex-direction:column;gap:7px">
+        ${['ZappyContabil → adicionar tag <b>SUSPENSO</b>',
+           'ZappyContabil → renomear para: <b>(SUSPENSO) '+c.nome+'</b>',
+           'Acessorias → <b>INATIVAR</b> acesso do cliente',
+           'Painel de clientes suspensos → <b>INCLUIR</b> o cliente',
+           'WhatsApp de suspensao enviado',
+           'Data/hora da suspensao registrada no sistema',
+           'CEO informado'].map((item,ii)=>`
           <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="tgSusChk(this)">
             <div style="min-width:18px;height:18px;border:2px solid var(--red2);border-radius:4px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0;transition:all .15s" class="sus-box"></div>
-            <span style="font-size:13px;color:var(--text2);line-height:1.4">${item}</span>
+            <span style="font-size:13px;color:var(--text2);line-height:1.4">${ii+1}. ${item}</span>
           </div>`).join('')}
       </div>
     </div>
     <div style="background:var(--green-bg);border:1px solid #0a4a28;border-radius:var(--r);padding:16px;margin-top:10px">
-      <div class="dbt" style="color:var(--green);margin-bottom:12px">✅ CHECKLIST DE REATIVAÇÃO — após pagamento confirmado</div>
+      <div class="dbt" style="color:var(--green);margin-bottom:12px">CHECKLIST DE REATIVACAO — apos pagamento confirmado</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        ${['① Confirmar pagamento integral ou acordo formalizado',
-           '② ZappyContábil → <b>REMOVER</b> tag SUSPENSO',
-           '③ ZappyContábil → restaurar nome original: <b>'+c.nome+'</b>',
-           '④ Acessórias → <b>REATIVAR</b> acesso do cliente',
-           '⑤ Painel de clientes suspensos → <b>REMOVER</b> o cliente',
-           '⑥ Data/hora da reativação registrada no sistema',
-           '⑦ Orientar cliente sobre declarações em atraso e multas do período'].map((item)=>`
+        ${['Confirmar pagamento integral ou acordo formalizado',
+           'ZappyContabil → <b>REMOVER</b> tag SUSPENSO',
+           'ZappyContabil → restaurar nome original: <b>'+c.nome+'</b>',
+           'Acessorias → <b>REATIVAR</b> acesso do cliente',
+           'Painel de clientes suspensos → <b>REMOVER</b> o cliente',
+           'Data/hora da reativacao registrada no sistema',
+           'Orientar cliente sobre declaracoes em atraso e multas do periodo'].map((item,ii)=>`
           <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="tgSusChk(this)">
             <div style="min-width:18px;height:18px;border:2px solid #0a4a28;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0;transition:all .15s" class="sus-box-g"></div>
-            <span style="font-size:13px;color:var(--text2);line-height:1.4">${item}</span>
+            <span style="font-size:13px;color:var(--text2);line-height:1.4">${ii+1}. ${item}</span>
           </div>`).join('')}
       </div>
     </div>` : '';
@@ -539,24 +580,27 @@ function showDetail(idx){
     <div class="dp">
       <div class="dp-top">
         <div><div class="dp-name">${c.nome}</div>
-        <div class="dp-meta">D+${c.dm} · R$ ${fmt(c.total)} em aberto · <span class="bdg ${r.css}">${r.label}</span></div></div>
-        <button class="btn" onclick="selectedIdx=null;document.getElementById('dpanel').innerHTML='';renderTable()">Fechar ×</button>
+        <div class="dp-meta">D+${c.dm} · R$ ${fmt(c.total)} em aberto · <span class="bdg ${r.css}">${r.label}</span>${c.parcelas&&c.parcelas.length>1?' · <b style="color:var(--amber)">'+c.parcelas.length+' boletos</b>':''}</div></div>
+        <button class="btn" onclick="selectedIdx=null;document.getElementById('dpanel').innerHTML='';renderTable()">Fechar x</button>
       </div>
-      ${alrt}
+      ${multiInfo}${alrt}
       <div class="dp-grid">
         <div class="dp-box">
           <div class="dbt">Canal de contato</div><div class="dba" style="margin-bottom:12px">${r.canal}</div>
           <div class="dbt">O que fazer agora</div><div class="dba" style="margin-bottom:14px">${r.acao}</div>
-          <div class="dbt">Parcelas em aberto</div>
-          <div>${(c.parcelas||[]).map(p=>`<div class="parc-row"><span>${p.venc||'—'}</span><span style="color:${(p.dias||c.dm)>=35?'var(--red)':(p.dias||c.dm)>=20?'var(--amber)':'var(--text2)'}">R$ ${fmt(p.valor)} · D+${p.dias||c.dm}</span></div>`).join('')}</div>
+          <div class="dbt">Parcelas em aberto${c.parcelas&&c.parcelas.length>1?' <span style="color:var(--amber);font-size:10px;font-weight:400">(★ = mais antiga — define a classificacao)</span>':''}</div>
+          <div>${(c.parcelas||[]).sort((a,b)=>(b.dias||0)-(a.dias||0)).map(p=>{
+            const isOldest=p.dias===c.dm;
+            return`<div class="parc-row" style="${isOldest&&c.parcelas.length>1?'background:#2a1800;':''}">
+              <span>${isOldest&&c.parcelas.length>1?'★ ':''}<b style="font-size:11px">${p.venc||'—'}</b></span>
+              <span style="color:${(p.dias||c.dm)>=35?'var(--red)':(p.dias||c.dm)>=20?'var(--amber)':'var(--text2)'}">R$ ${fmt(p.valor)} · D+${p.dias||c.dm}</span>
+            </div>`;
+          }).join('')}</div>
           ${suspCheckList}
         </div>
         <div class="dp-box">
           <div class="dbt">Script de cobrança — WhatsApp</div>
-          <div class="brow">
-            <label>🔗 Link do boleto:</label>
-            <input type="url" id="bi-${idx}" value="${boleto}" placeholder="Cole o link do boleto aqui" oninput="updB(${idx})">
-          </div>
+          ${buildBoletoInputs(idx,c)}
           <div class="smsg" id="sm-${idx}">${msg}</div>
           <button class="btn cp-btn" onclick="cpMsg(${idx})">Copiar mensagem</button>
         </div>
@@ -565,11 +609,51 @@ function showDetail(idx){
   document.getElementById('dpanel').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
-function updB(idx){
-  bMap[idx]=(document.getElementById('bi-'+idx)||{}).value||'';
-  const c=processedData[idx];const r=classify(c.dm);
-  const el=document.getElementById('sm-'+idx);if(el)el.textContent=r.msg(c,bMap[idx]);
+function buildBoletoInputs(idx, c){
+  const parcelas=(c.parcelas||[]).slice().sort((a,b)=>(b.dias||0)-(a.dias||0));
+  if(parcelas.length<=1){
+    const val=(bMap[idx]&&bMap[idx][0])||'';
+    return `<div class="brow" style="margin-bottom:8px">
+      <label style="color:var(--amber);font-size:11px;font-weight:700;white-space:nowrap">🔗 Link do boleto:</label>
+      <input type="url" id="bi-${idx}-0" value="${val}" placeholder="Cole o link do boleto aqui" oninput="updB(${idx})" style="flex:1;min-width:200px;background:var(--bg2);border:1px solid #854F0B;border-radius:var(--r);color:var(--text);font-size:13px;padding:6px 10px;outline:none">
+    </div>`;
+  }
+  // Múltiplos boletos — um campo por parcela
+  return `<div style="margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px">🔗 Links dos boletos — 1 por parcela</div>
+    ${parcelas.map((p,i)=>{
+      const val=(bMap[idx]&&bMap[idx][i])||'';
+      const isOldest=p.dias===c.dm;
+      return `<div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+        <span style="font-size:11px;color:${isOldest?'var(--amber)':'var(--text3)'};white-space:nowrap;min-width:130px">
+          ${isOldest?'★ ':''}${p.venc||'—'} · R$ ${fmt(p.valor)}
+        </span>
+        <input type="url" id="bi-${idx}-${i}" value="${val}" placeholder="Link boleto ${i+1}" oninput="updB(${idx})"
+          style="flex:1;background:var(--bg2);border:1px solid ${isOldest?'#854F0B':'#2a2a3e'};border-radius:var(--r);color:var(--text);font-size:12px;padding:5px 9px;outline:none">
+      </div>`;
+    }).join('')}
+  </div>`;
 }
+
+function getLinks(idx,c){
+  const parcelas=(c.parcelas||[]).slice().sort((a,b)=>(b.dias||0)-(a.dias||0));
+  const n=Math.max(1,parcelas.length);
+  const arr=[];
+  for(let i=0;i<n;i++){
+    const el=document.getElementById(`bi-${idx}-${i}`);
+    arr.push(el?el.value.trim():'');
+  }
+  return arr;
+}
+
+function updB(idx){
+  const c=processedData[idx];if(!c)return;
+  const r=classify(c.dm);
+  bMap[idx]=getLinks(idx,c);
+  const el=document.getElementById('sm-'+idx);
+  if(el) el.textContent=r.msg(c,bMap[idx]);
+}
+
 function cpMsg(idx){
   const el=document.getElementById('sm-'+idx);if(!el)return;
   navigator.clipboard.writeText(el.textContent).then(()=>{
@@ -600,38 +684,125 @@ function exportCSV(){
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='cobranca.csv';a.click();URL.revokeObjectURL(url);
 }
 
-// ── CADÊNCIA ──
+// ── CADÊNCIA — 3 CONTATOS POR DIA ──
 const CAD=[
-  {dia:'D-5',tipo:'Preventivo',canal:'WhatsApp',cor:'#10b981',bg:'#08201a',acao:'Envio preventivo. Registrar no sistema.',
-   s:`Olá [NOME] 😊 Passando para lembrar que sua fatura de [MÊS] (R$ [VALOR]) vence em 5 dias — dia [DATA].\n\n💰 Link para pagamento: [COLE AQUI O LINK DO BOLETO]\n\nQualquer dúvida, estamos à disposição!`},
-  {dia:'D+1',tipo:'1º Contato',canal:'WhatsApp',cor:'#f59e0b',bg:'#201800',acao:'WhatsApp. Se sem resposta até fim do dia, ligar. Registrar.',
-   s:`Olá [NOME], sua fatura de R$ [VALOR] venceu ontem. Caso já tenha pago, nos envie o comprovante.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] 🙏`},
-  {dia:'D+2',tipo:'2º Contato',canal:'Ligação',cor:'#f97316',bg:'#201008',acao:'LIGAR obrigatoriamente. Anotar resposta exata. Se pedir boleto, enviar link pelo WhatsApp.',
-   s:`[NOME], aqui é [SEU NOME] do escritório. Sua fatura de R$ [VALOR] está em aberto desde [DATA]. Consegue pagar hoje?\n\n[Se pedir link → enviar pelo WhatsApp imediatamente]`},
-  {dia:'D+3',tipo:'3º Contato',canal:'WhatsApp',cor:'#f97316',bg:'#201008',acao:'WhatsApp firme. Se sem resposta em 2h, ligar. Registrar.',
-   s:`[NOME], sua fatura de R$ [VALOR] está em aberto há 3 dias. Preciso de uma posição sua HOJE.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+4',tipo:'4º Contato',canal:'WhatsApp + Ligação',cor:'#ef4444',bg:'#200808',acao:'WhatsApp informando multa/juros + LIGAR logo após. Registrar.',
-   s:`[NOME], fatura de R$ [VALOR] em aberto há 4 dias. Incidem multa 2% + juros 1%/mês. Valor atualizado: R$ [VALOR+ENCARGOS]. Regularize até amanhã.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+5',tipo:'5º Contato',canal:'Ligação + WhatsApp',cor:'#ef4444',bg:'#200808',acao:'LIGAR e WhatsApp simultaneamente. Pressionar por data concreta.',
-   s:`[NOME], 5 dias em aberto (R$ [VALOR]). Metade do prazo antes da suspensão. Preciso de uma resposta hoje.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+6',tipo:'6º Contato',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp. Aguardar 3h. Se sem retorno, ligar.',
-   s:`[NOME], faltam 4 dias para a suspensão dos seus serviços. Débito: R$ [VALOR]. Preciso de uma resposta HOJE.\n\n💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+7',tipo:'7º Contato',canal:'WhatsApp + Ligação',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp formal + LIGAR imediatamente após. Registrar.',
-   s:`[NOME], débito de R$ [VALOR] em aberto há 7 dias. SUSPENSÃO em 3 dias sem regularização ou acordo.\n\n💰 Evite a suspensão: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+8',tipo:'8º Contato',canal:'Ligação',cor:'#b91c1c',bg:'#180404',acao:'LIGAR obrigatório. Aceitar proposta só com data e valor escritos.',
-   s:`[NOME], 2 dias para a suspensão. Última ligação antes de tomarmos medidas. Tem condição de pagar hoje?\n\n[Se aceitar → enviar link do boleto pelo WhatsApp]`},
-  {dia:'D+9',tipo:'9º Contato — ÚLTIMO DIA',canal:'WhatsApp + Ligação',cor:'#991b1b',bg:'#160303',acao:'WhatsApp + LIGAR. Duplo contato obrigatório. Registrar horário.',
-   s:`[NOME], AMANHÃ seus serviços serão suspensos (R$ [VALOR]). Última oportunidade.\n\n💰 Pague agora e evite a suspensão: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+10',tipo:'🔴 SUSPENSÃO TOTAL',canal:'WhatsApp + Equipe Interna',cor:'#fff',bg:'#7f1d1d',
-   acao:`EXECUTAR AGORA — CHECKLIST OBRIGATÓRIO:
-① ZappyContábil → adicionar tag SUSPENSO ao cliente
-② ZappyContábil → renomear para: (SUSPENSO) [NOME DO CLIENTE]
-③ Acessórias → INATIVAR acesso do cliente
-④ Painel de clientes suspensos → INCLUIR o cliente
-⑤ Enviar WhatsApp de suspensão (script abaixo)
-⑥ Registrar data/hora da suspensão no sistema
+  // D-5
+  {dia:'D-5',turno:'☀️ 08h',tipo:'Preventivo',canal:'WhatsApp',cor:'#10b981',bg:'#08201a',acao:'Envio único preventivo. Registrar.',s:`Olá [NOME] 😊 Sua fatura de [MÊS] (R$ [VALOR]) vence em 5 dias — dia [DATA].
+
+💰 Pague com antecedência: [COLE AQUI O LINK DO BOLETO]
+
+Qualquer dúvida, estamos à disposição!`},
+
+  // D+1
+  {dia:'D+1',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#f59e0b',bg:'#201800',acao:'WhatsApp de abertura. Registrar.',s:`Olá [NOME], sua fatura de R$ [VALOR] venceu ontem. Caso já tenha pago, envie o comprovante. Caso não, pedimos a regularização hoje.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO] 🙏`},
+  {dia:'D+1',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#f59e0b',bg:'#201800',acao:'LIGAR se não respondeu o WhatsApp da manhã.',s:`[NOME], aqui é [SEU NOME] do escritório. Estou ligando sobre a fatura de R$ [VALOR] que venceu ontem. Consegue regularizar hoje?
+
+[Se pedir boleto → enviar pelo WhatsApp imediatamente]`},
+  {dia:'D+1',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#f59e0b',bg:'#201800',acao:'Último WhatsApp do dia se ainda sem retorno.',s:`[NOME], último lembrete de hoje: fatura de R$ [VALOR] vencida ontem. Envie o comprovante ou regularize.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+2
+  {dia:'D+2',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#f97316',bg:'#201008',acao:'WhatsApp de abertura. Tom mais firme.',s:`[NOME], fatura de R$ [VALOR] em aberto há 2 dias. Preciso de uma posição sua HOJE.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+2',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#f97316',bg:'#201008',acao:'LIGAR obrigatoriamente. Anotar resposta exata.',s:`[NOME], segundo dia de contato. Fatura de R$ [VALOR] em aberto desde [DATA]. Tem condição de pagar hoje ou precisa de um prazo?
+
+[Se pedir boleto → enviar pelo WhatsApp]`},
+  {dia:'D+2',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#f97316',bg:'#201008',acao:'WhatsApp final do dia. Registrar como "sem contato" se sem retorno.',s:`[NOME], encerrando o dia sem retorno sobre a fatura de R$ [VALOR]. Amanhã precisamos resolver. Me chame a qualquer momento.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+3
+  {dia:'D+3',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp informando multa e juros.',s:`[NOME], 3 dias em aberto. Já incidem multa 2% + juros 1%/mês sobre R$ [VALOR]. Valor atualizado: R$ [VALOR+ENCARGOS].
+
+💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+3',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#ef4444',bg:'#200808',acao:'LIGAR. Pressionar por data concreta.',s:`[NOME], sua fatura já acumula multa e juros — R$ [VALOR+ENCARGOS] no total. Me dá uma data concreta de pagamento hoje?
+
+[Se pedir boleto → enviar pelo WhatsApp]`},
+  {dia:'D+3',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp final. Mencionar suspensão se não pagar até D+10.',s:`[NOME], 3º dia sem regularização (R$ [VALOR+ENCARGOS]). Sem pagamento ou acordo até o 10º dia os serviços serão suspensos.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+4
+  {dia:'D+4',turno:'☀️ 08h — 1º contato',tipo:'Ligação',canal:'Ligação',cor:'#ef4444',bg:'#200808',acao:'LIGAR como abertura do dia.',s:`[NOME], 4 dias em aberto. Estou ligando cedo para resolver antes de escalar. Tem condição de pagar hoje?
+
+[Se sim → enviar boleto pelo WhatsApp]`},
+  {dia:'D+4',turno:'🌤️ 13h — 2º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp da tarde. Reforçar urgência.',s:`[NOME], falta de retorno sobre R$ [VALOR+ENCARGOS]. Faltam 6 dias para a suspensão. Preciso de uma posição HOJE.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+4',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#ef4444',bg:'#200808',acao:'WhatsApp final do dia.',s:`[NOME], último contato do dia. Fatura de R$ [VALOR+ENCARGOS] em aberto há 4 dias. Me responda com data de pagamento ou comprovante.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+5
+  {dia:'D+5',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'Alerta de metade do prazo.',s:`[NOME], hoje é o 5º dia — metade do prazo antes da suspensão. Débito: R$ [VALOR+ENCARGOS].
+
+💰 Regularize agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+5',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#dc2626',bg:'#1a0505',acao:'LIGAR. Exigir data ou proposta de acordo.',s:`[NOME], chegamos na metade do prazo. Sem pagamento ou acordo até o dia 10, serviços serão suspensos. O que você pode fazer hoje?
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+5',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp final. Registrar.',s:`[NOME], encerrando o 5º dia sem regularização (R$ [VALOR+ENCARGOS]). Amanhã o prazo fica ainda mais crítico.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+6
+  {dia:'D+6',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp — 4 dias para suspensão.',s:`[NOME], faltam 4 dias para a SUSPENSÃO dos serviços. Débito: R$ [VALOR+ENCARGOS]. Preciso de resposta HOJE.
+
+💰 Regularize: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+6',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#dc2626',bg:'#1a0505',acao:'LIGAR. Última tentativa de acordo amigável.',s:`[NOME], 4 dias para a suspensão. Se tiver dificuldade financeira, podemos conversar sobre um acordo. Mas preciso de resposta hoje.
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+6',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#dc2626',bg:'#1a0505',acao:'WhatsApp final.',s:`[NOME], 3 dias restantes antes da suspensão. R$ [VALOR+ENCARGOS] sem regularização. Amanhã intensificamos.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+7
+  {dia:'D+7',turno:'☀️ 08h — 1º contato',tipo:'WhatsApp — Notificação',canal:'WhatsApp',cor:'#b91c1c',bg:'#180404',acao:'WhatsApp formal de notificação oficial.',s:`[NOME], NOTIFICAÇÃO: débito de R$ [VALOR+ENCARGOS] há 7 dias. SUSPENSÃO em 3 dias sem regularização ou acordo.
+
+💰 Evite a suspensão: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+7',turno:'🌤️ 13h — 2º contato',tipo:'Ligação',canal:'Ligação',cor:'#b91c1c',bg:'#180404',acao:'LIGAR obrigatoriamente. Registrar resposta.',s:`[NOME], estou ligando para formalizar: faltam 3 dias para a suspensão. Tem condição de regularizar hoje ou quer propor um acordo formal?
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+7',turno:'🌆 17h — 3º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#b91c1c',bg:'#180404',acao:'WhatsApp final. Último alerta antes dos 2 dias finais.',s:`[NOME], encerrando o 7º dia. Restam 3 dias. Amanhã e depois são os últimos contatos antes da suspensão automática.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+8
+  {dia:'D+8',turno:'☀️ 08h — 1º contato',tipo:'Ligação',canal:'Ligação',cor:'#991b1b',bg:'#160303',acao:'LIGAR logo cedo. Tom definitivo. 2 dias restantes.',s:`[NOME], ligo cedo porque faltam 2 dias para a suspensão. Ainda tenho autorização para negociar hoje. Consegue resolver agora?
+
+[Se aceitar → enviar boleto pelo WhatsApp]`},
+  {dia:'D+8',turno:'🌤️ 13h — 2º contato',tipo:'WhatsApp',canal:'WhatsApp',cor:'#991b1b',bg:'#160303',acao:'WhatsApp da tarde. Urgência máxima.',s:`[NOME], 2 dias para a suspensão. R$ [VALOR+ENCARGOS]. Esta é uma das últimas oportunidades antes do bloqueio dos serviços.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+8',turno:'🌆 17h — 3º contato',tipo:'Ligação',canal:'Ligação',cor:'#991b1b',bg:'#160303',acao:'LIGAR no fim do dia. Deixar recado se não atender.',s:`[NOME], última ligação do dia. Restam 2 dias para suspensão. Me retorne hoje ainda ou amanhã cedo.
+
+[Se aceitar → propor acordo imediato]`},
+
+  // D+9 — ÚLTIMO DIA
+  {dia:'D+9',turno:'☀️ 08h — URGENTE',tipo:'ÚLTIMO DIA — 1º contato',canal:'WhatsApp + Ligação',cor:'#7f1d1d',bg:'#120202',acao:'WhatsApp E ligar na sequência. Registrar horário.',s:`[NOME], ATENÇÃO: AMANHÃ seus serviços serão SUSPENSOS (R$ [VALOR+ENCARGOS]). Última oportunidade.
+
+💰 Pague AGORA: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+9',turno:'🌤️ 13h — 2º contato',tipo:'ÚLTIMO DIA — Ligação',canal:'Ligação',cor:'#7f1d1d',bg:'#120202',acao:'LIGAR. Se não atender, deixar recado detalhado.',s:`[NOME], ligo pela segunda vez hoje. É o último dia. Preciso de pagamento, comprovante ou proposta de acordo formal agora.
+
+[Se aceitar → enviar boleto pelo WhatsApp imediatamente]`},
+  {dia:'D+9',turno:'🌆 17h — CONTATO FINAL',tipo:'ÚLTIMO DIA — 3º contato',canal:'WhatsApp + Ligação',cor:'#7f1d1d',bg:'#120202',acao:'LIGAR e WhatsApp simultâneos. Último contato antes da suspensão.',s:`[NOME], ÚLTIMO AVISO: amanhã os serviços serão suspensos às 08h. Entre em contato AGORA, mesmo para propor um acordo.
+
+💰 Pague agora e cancele a suspensão: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+10 SUSPENSÃO
+  {dia:'D+10',turno:'☀️ 08h — EXECUTAR',tipo:'🔴 SUSPENSÃO TOTAL',canal:'WhatsApp + Equipe Interna',cor:'#fff',bg:'#7f1d1d',
+   acao:`CHECKLIST — executar às 08h:
+① ZappyContábil → adicionar tag SUSPENSO
+② ZappyContábil → renomear: (SUSPENSO) [NOME DO CLIENTE]
+③ Acessórias → INATIVAR acesso
+④ Painel de suspensos → INCLUIR
+⑤ Enviar WhatsApp de suspensão
+⑥ Registrar data/hora no sistema
 ⑦ INFORMAR CEO imediatamente`,
-   s:`Prezado(a) [NOME], comunicamos o BLOQUEIO IMEDIATO de todos os serviços contábeis em razão do débito de R$ [VALOR] em aberto há 10 dias sem nenhuma posição de pagamento ou negociação.
+   s:`Prezado(a) [NOME], comunicamos o BLOQUEIO IMEDIATO dos serviços contábeis por débito de R$ [VALOR] em aberto há 10 dias sem nenhuma posição.
 
 ⛔ A partir de hoje NÃO serão entregues:
 • Declarações fiscais (DAS, DCTF, SPED, ECF, ECD)
@@ -639,94 +810,168 @@ const CAD=[
 • Relatórios, balancetes e demonstrativos
 • Guias de pagamento e certidões
 
-⚠️ IMPORTANTE: todas as multas e juros decorrentes do não envio das declarações fiscais são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA, conforme contrato.
+⚠️ Multas e juros por não entrega são de EXCLUSIVA RESPONSABILIDADE DA EMPRESA, conforme contrato.
 
-A retomada dos serviços ocorrerá SOMENTE após quitação integral do débito ou acordo formalizado por escrito.
+💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
 
-💰 Quite agora e evite as multas fiscais: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'✅ REATIVAÇÃO',tipo:'Procedimento de Reativação',canal:'Interno — após pagamento confirmado',cor:'#10b981',bg:'#08201a',
-   acao:`CHECKLIST DE REATIVAÇÃO — executar após confirmação do pagamento:
+  // D+11 a D+14 — PÓS-SUSPENSÃO (3x/dia)
+  {dia:'D+11',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp de abertura. Multas fiscais.',s:`[NOME], serviços SUSPENSOS desde ontem. DAS, DCTF e demais obrigações NÃO estão sendo entregues — multas de responsabilidade da empresa.
+
+💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+11',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Citar obrigações que vencem esta semana.',s:`[NOME], 1 dia suspenso. DAS, DCTF e obrigações não serão entregues. Multas automáticas de responsabilidade da empresa.
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+11',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp final do dia.',s:`[NOME], 1 dia suspenso. Cada dia aumenta o risco fiscal. Me chame a qualquer momento.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  {dia:'D+12',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR cedo. Citar obrigação fiscal específica.',s:`[NOME], 2 dias suspenso. DAS do mês não será entregue — multa automática de responsabilidade da empresa. Vamos resolver hoje?
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+12',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp da tarde.',s:`[NOME], 2 dias sem cobertura contábil. Obrigações em atraso. Multas são de sua responsabilidade.
+
+💰 Regularize: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+12',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp final.',s:`[NOME], encerrando o 2º dia suspenso. Ainda há tempo antes das multas se acumularem. Me contate agora.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  {dia:'D+13',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp. Começar a mencionar protesto.',s:`[NOME], 3 dias suspenso. Débito: R$ [VALOR]. Declarações não entregues. Em breve: protesto em cartório.
+
+💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+13',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR. Tentar pagamento parcial.',s:`[NOME], 3 dias suspenso. Você tem condição de pagar ao menos parte hoje? Qualquer valor reduz o débito antes do protesto.
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+13',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp final.',s:`[NOME], 3º dia suspenso encerrado. O protesto está se aproximando. Me contate amanhã pela manhã.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  {dia:'D+14',turno:'☀️ 08h — 1º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR cedo. 2 semanas de débito.',s:`[NOME], 14 dias de débito e 4 suspenso. Situação crítica. Tem como resolver hoje?
+
+[Se aceitar → enviar boleto pelo WhatsApp]`},
+  {dia:'D+14',turno:'🌤️ 13h — 2º contato',tipo:'Pós-Suspensão',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp da tarde. Escalada iminente.',s:`[NOME], 2 semanas em aberto. Poucos dias para o aviso formal de protesto. Ainda tenho autorização para negociar.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+14',turno:'🌆 17h — 3º contato',tipo:'Pós-Suspensão',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'LIGAR. Última tentativa antes do aviso de protesto.',s:`[NOME], última ligação do dia. Amanhã o caso entra na fase de aviso de protesto. Ainda podemos resolver.
+
+[Se aceitar → enviar boleto]`},
+
+  // D+15 a D+19 — PRÉ-PROTESTO (3x/dia)
+  {dia:'D+15',turno:'☀️ 08h — 1º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp — protesto em 5 dias.',s:`[NOME], 15 dias em aberto. Em 5 dias o título vai para PROTESTO EM CARTÓRIO e CNPJ será negativado no SERASA/SPC.
+
+💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+15',turno:'🌤️ 13h — 2º contato',tipo:'Pré-protesto',canal:'Ligação',cor:'#a855f7',bg:'#0d0620',acao:'LIGAR. Explicar consequências do protesto.',s:`[NOME], em 5 dias o título vai a cartório. Protesto aparece no Diário Oficial, restringe crédito e certidões do CNPJ. Ainda posso segurar.
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+15',turno:'🌆 17h — 3º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp final.',s:`[NOME], encerrando o dia. Faltam 5 dias para o protesto. Resolva antes que seja tarde.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  {dia:'D+16',turno:'☀️ 08h — 1º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp — 4 dias para o protesto.',s:`[NOME], faltam 4 dias para o PROTESTO EM CARTÓRIO. Débito: R$ [VALOR]. Evite a negativação do CNPJ.
+
+💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+16',turno:'🌤️ 13h — 2º contato',tipo:'Pré-protesto',canal:'Ligação',cor:'#a855f7',bg:'#0d0620',acao:'LIGAR. Última negociação antes do protesto.',s:`[NOME], 4 dias para o protesto. Última oportunidade de acordo antes que o título vá ao cartório.
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+16',turno:'🌆 17h — 3º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp final.',s:`[NOME], 4 dias restantes. Custas do protesto serão cobradas do devedor.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  {dia:'D+17',turno:'☀️ 08h — 1º contato',tipo:'Pré-protesto',canal:'Ligação',cor:'#7c3aed',bg:'#0c0618',acao:'LIGAR cedo. 3 dias para protesto.',s:`[NOME], 3 dias para o protesto. Estou ligando cedo para tentar resolver. Tem condição de pagar hoje?
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+17',turno:'🌤️ 13h — 2º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#7c3aed',bg:'#0c0618',acao:'WhatsApp da tarde. Tom urgente.',s:`[NOME], 3 dias para o PROTESTO. Isso afeta todas as operações bancárias do CNPJ. Regularize HOJE.
+
+💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+17',turno:'🌆 17h — 3º contato',tipo:'Pré-protesto',canal:'Ligação',cor:'#7c3aed',bg:'#0c0618',acao:'LIGAR. Deixar recado se não atender.',s:`[NOME], última ligação do dia. Restam 3 dias. Me retorne hoje ou amanhã cedo.
+
+[Se aceitar → enviar boleto]`},
+
+  {dia:'D+18',turno:'☀️ 08h — 1º contato',tipo:'Pré-protesto',canal:'WhatsApp + Ligação',cor:'#6d28d9',bg:'#0a0514',acao:'WhatsApp E ligar logo após. 2 dias para protesto.',s:`[NOME], ATENÇÃO: faltam 2 dias para o PROTESTO. Débito: R$ [VALOR]. Ainda há tempo de evitar a negativação.
+
+💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+18',turno:'🌤️ 13h — 2º contato',tipo:'Pré-protesto',canal:'Ligação',cor:'#6d28d9',bg:'#0a0514',acao:'LIGAR. Pressionar ao máximo.',s:`[NOME], 2 dias para o protesto. Qual o valor que o senhor(a) consegue pagar agora para segurarmos?
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+18',turno:'🌆 17h — 3º contato',tipo:'Pré-protesto',canal:'WhatsApp',cor:'#6d28d9',bg:'#0a0514',acao:'WhatsApp final.',s:`[NOME], amanhã é o penúltimo dia antes do protesto. Resolva isso. Me responda agora.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  {dia:'D+19',turno:'☀️ 08h — VÉSPERA',tipo:'Véspera do protesto',canal:'WhatsApp + Ligação',cor:'#5b21b6',bg:'#080412',acao:'WhatsApp E ligar imediatamente.',s:`[NOME], AMANHÃ o título vai para PROTESTO EM CARTÓRIO e CNPJ será negativado no SERASA/SPC. Última oportunidade.
+
+💰 Pague AGORA: [COLE AQUI O LINK DO BOLETO] ☎️`},
+  {dia:'D+19',turno:'🌤️ 13h — 2º contato',tipo:'Véspera do protesto',canal:'Ligação',cor:'#5b21b6',bg:'#080412',acao:'LIGAR. Última tentativa de acordo.',s:`[NOME], ligo pela segunda vez hoje. AMANHÃ o protesto é executado. Ainda estou com autorização para receber e suspender. O que você propõe?
+
+[Se aceitar → enviar boleto imediatamente]`},
+  {dia:'D+19',turno:'🌆 17h — ÚLTIMO CONTATO',tipo:'Véspera do protesto',canal:'WhatsApp + Ligação',cor:'#5b21b6',bg:'#080412',acao:'LIGAR e WhatsApp simultâneos. Registrar tudo com horário.',s:`[NOME], ÚLTIMO CONTATO antes do protesto amanhã. Entre em contato AGORA para evitar a negativação pública do CNPJ.
+
+💰 Regularize agora: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+20 AVISO DE PROTESTO (3 contatos)
+  {dia:'D+20',turno:'☀️ 08h — AVISO FORMAL',tipo:'⚠️ Aviso de Protesto',canal:'WhatsApp + Ligação',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp formal + LIGAR após. Registrar. Aguardar 5 dias para executar.',s:`[NOME], comunicamos formalmente que o débito de R$ [VALOR] em aberto há 20 dias será encaminhado para PROTESTO EM CARTÓRIO em 5 dias úteis, com negativação no SERASA/SPC.
+
+💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
+  {dia:'D+20',turno:'🌤️ 13h — 2º contato',tipo:'⚠️ Reforço do aviso',canal:'Ligação',cor:'#fff',bg:'#4c1d95',acao:'LIGAR para confirmar recebimento do aviso.',s:`[NOME], estou ligando para confirmar o recebimento do aviso de protesto enviado esta manhã. Recebeu? Ainda temos 5 dias para resolver sem o protesto.
+
+[Se aceitar → enviar boleto]`},
+  {dia:'D+20',turno:'🌆 17h — 3º contato',tipo:'⚠️ Último contato do dia',canal:'WhatsApp',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp final. Registrar.',s:`[NOME], encerrando o dia do aviso formal. Faltam 4 dias para a execução do protesto. Regularize o quanto antes.
+
+💰 Link: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+25 PROTESTO
+  {dia:'D+25',turno:'☀️ 08h — EXECUTAR',tipo:'🟣 Protesto em Cartório',canal:'Cartório + SERASA + WhatsApp',cor:'#fff',bg:'#3b0764',acao:'Levar título ao cartório. Negativar SERASA/SPC. Comunicar cliente. Informar CEO.',s:`[NOME], o título referente ao débito de R$ [VALOR] foi encaminhado para PROTESTO EM CARTÓRIO hoje. CNPJ sendo negativado no SERASA/SPC. Para cancelamento: quitação integral + custas cartorárias.
+
+💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
+
+  // D+35 JURÍDICO
+  {dia:'D+35',turno:'☀️ 08h — ENCAMINHAR',tipo:'⚖️ Ação Judicial',canal:'Advogado + Carta Registrada',cor:'#94a3b8',bg:'#0a0a12',acao:'Acionar advogado. Enviar contrato, NFs e histórico completo.',s:`Processo encaminhado ao jurídico. Débito: R$ [VALOR + MULTA + JUROS + CUSTAS]. Cliente protestado e negativado.`},
+
+  // REATIVAÇÃO
+  {dia:'REATIVAÇÃO',turno:'Após pagamento confirmado',tipo:'Procedimento de Reativação',canal:'Interno + WhatsApp',cor:'#10b981',bg:'#08201a',
+   acao:`CHECKLIST DE REATIVAÇÃO:
 ① Confirmar pagamento integral ou acordo formalizado
-② ZappyContábil → REMOVER tag SUSPENSO do cliente
-③ ZappyContábil → RESTAURAR nome original (retirar "(SUSPENSO)")
-④ Acessórias → REATIVAR acesso do cliente
-⑤ Painel de clientes suspensos → REMOVER o cliente
-⑥ Registrar data/hora da reativação no sistema
-⑦ Verificar declarações em atraso durante o período suspenso — orientar cliente sobre multas pendentes
-⑧ Comunicar equipe técnica para retomar os serviços`,
-   s:`Olá [NOME], seu pagamento foi confirmado e seus serviços contábeis foram REATIVADOS a partir de hoje.
+② ZappyContábil → REMOVER tag SUSPENSO
+③ ZappyContábil → restaurar nome original
+④ Acessórias → REATIVAR acesso
+⑤ Painel de suspensos → REMOVER
+⑥ Registrar data/hora da reativação
+⑦ Orientar cliente sobre declarações em atraso
+⑧ Comunicar equipe técnica`,
+   s:`Olá [NOME], seu pagamento foi confirmado e seus serviços foram REATIVADOS a partir de hoje.
 
-✅ Seu acesso ao portal Acessórias foi restaurado.
+Seu acesso ao portal Acessórias foi restaurado.
 
-⚠️ Atenção: durante o período de suspensão, as declarações fiscais não foram entregues. Nossa equipe entrará em contato para orientá-lo(a) sobre as providências necessárias em relação às obrigações do período.
+Atenção: durante a suspensão, as declarações fiscais não foram entregues. Nossa equipe entrará em contato sobre as obrigações do período.
 
-Qualquer dúvida, estamos à disposição. Agradecemos a regularização!`},
-  {dia:'D+11',tipo:'Pós-Suspensão — Dia 1',canal:'WhatsApp',cor:'#f87171',bg:'#1a0808',acao:'Reforçar que empresa está sem cobertura contábil E que multas são responsabilidade do cliente. Registrar.',
-   s:`[NOME], seus serviços contábeis estão SUSPENSOS desde ontem por falta de pagamento (R$ [VALOR]).
-
-⛔ Declarações fiscais (DAS, DCTF, SPED e demais obrigações) NÃO estão sendo entregues.
-
-⚠️ Todas as multas e juros gerados pela não entrega são de sua responsabilidade, conforme contrato.
-
-Regularize agora e evite um problema ainda maior.
-
-💰 Quite agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+12',tipo:'Pós-Suspensão — Dia 2',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Mencionar obrigações que vencem esta semana. Lembrar que multas são responsabilidade deles.',
-   s:`[NOME], serviços suspensos há 2 dias. Neste período, as seguintes obrigações NÃO estão sendo entregues pelo escritório: DAS, DCTF, SPED e demais acessórias.
-
-⚠️ As multas e juros por não entrega dessas declarações são de sua exclusiva responsabilidade. Isso pode gerar autuação fiscal imediata.
-
-Vamos resolver hoje?
-
-[Se aceitar → enviar link do boleto pelo WhatsApp imediatamente]`},
-  {dia:'D+13',tipo:'Pós-Suspensão — Dia 3',canal:'WhatsApp + Ligação',cor:'#f87171',bg:'#1a0808',acao:'WhatsApp + LIGAR. Citar obrigação fiscal específica que está próxima. Registrar.',
-   s:`[NOME], 3 dias suspenso. Sua empresa está acumulando risco fiscal a cada dia:
-
-⛔ Declarações não entregues: DAS, DCTF e demais obrigações
-⚠️ Multas por atraso: responsabilidade da empresa, não do escritório
-
-O débito de R$ [VALOR] cresce com multa e juros. Regularize agora.
-
-💰 Pague agora: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+14',tipo:'Pós-Suspensão — Dia 4',canal:'Ligação',cor:'#f87171',bg:'#1a0808',acao:'LIGAR. Tentar pagamento parcial. Qualquer acordo por escrito.',
-   s:`[NOME], 14 dias de débito em aberto e 4 dias sem cobertura contábil. Sua empresa está exposta a multas fiscais crescentes que são de sua responsabilidade.
-
-Tem condição de pagar ao menos parte hoje para iniciarmos a reativação?
-
-[Se aceitar → enviar link do boleto pelo WhatsApp imediatamente]`},
-  {dia:'D+15',tipo:'Pós-Suspensão — Dia 5',canal:'WhatsApp',cor:'#c084fc',bg:'#0f0818',acao:'Alerta de escalada iminente. Última chance de acordo favorável.',
-   s:`[NOME], 15 dias em aberto. Próximos de medidas legais. Ainda posso negociar.\n\n💰 Pague agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+16',tipo:'Pós-Suspensão — Dia 6',canal:'WhatsApp + Ligação',cor:'#c084fc',bg:'#0f0818',acao:'WhatsApp + LIGAR após. Registrar com horário.',
-   s:`[NOME], débito de R$ [VALOR] em aberto há 16 dias. Protesto em cartório em breve.\n\n💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+17',tipo:'Pós-Suspensão — Dia 7',canal:'Ligação',cor:'#c084fc',bg:'#0f0818',acao:'Última ligação antes do aviso de protesto. Deixar recado na caixa postal.',
-   s:`[NOME], última ligação antes do protesto em cartório. Ainda podemos resolver.\n\n[Se aceitar → enviar link pelo WhatsApp]`},
-  {dia:'D+18',tipo:'Pós-Suspensão — Dia 8',canal:'WhatsApp + Ligação',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp + LIGAR. Duplo contato. Registrar com horário.',
-   s:`[NOME], em 2 dias título vai para PROTESTO EM CARTÓRIO. Restringe todo crédito do CNPJ. Ainda dá tempo.\n\n💰 Pague agora e evite o protesto: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+19',tipo:'Pós-Suspensão — Dia 9',canal:'WhatsApp + Ligação',cor:'#a855f7',bg:'#0d0620',acao:'WhatsApp + LIGAR. Duplo contato. Registrar tudo com horário.',
-   s:`[NOME], AMANHÃ débito de R$ [VALOR] vai para protesto. Última oportunidade.\n\n💰 Regularize agora: [COLE AQUI O LINK DO BOLETO] ☎️`},
-  {dia:'D+20',tipo:'⚠️ AVISO DE PROTESTO',canal:'WhatsApp + Ligação',cor:'#fff',bg:'#4c1d95',acao:'WhatsApp formal + LIGAR. Aguardar 5 dias antes de executar.',
-   s:`[NOME], débito de R$ [VALOR] em aberto há 20 dias. Em 5 dias úteis o título será PROTESTADO e CNPJ negativado no SERASA/SPC.\n\n💰 Evite o protesto: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+25',tipo:'🟣 PROTESTO EM CARTÓRIO',canal:'Cartório + SERASA + WhatsApp',cor:'#fff',bg:'#3b0764',acao:'Levar título ao cartório. Negativar SERASA/SPC. Informar CEO.',
-   s:`[NOME], título de R$ [VALOR] encaminhado para PROTESTO EM CARTÓRIO. CNPJ sendo negativado no SERASA/SPC. Cancelamento: quitação integral + custas cartorárias.\n\n💰 Quite agora: [COLE AQUI O LINK DO BOLETO]`},
-  {dia:'D+35',tipo:'⚖️ AÇÃO JUDICIAL',canal:'Advogado + Carta Registrada',cor:'#94a3b8',bg:'#0a0a12',acao:'Acionar advogado. Enviar contrato, NFs e histórico completo.',
-   s:`Processo encaminhado ao jurídico. Débito: R$ [VALOR + MULTA + JUROS + CUSTAS]. Cliente protestado e negativado.`},
+Obrigado pela regularização!`},
 ];
 
 function renderCadencia(){
-  document.getElementById('cadlist').innerHTML=CAD.map((c,i)=>`
-    <div class="ci" style="${c.dia==='✅ REATIVAÇÃO'?'border-color:#0a4a28':''}">
-      <div class="ch" onclick="tgC(${i})" style="${c.dia==='✅ REATIVAÇÃO'?'background:var(--green-bg)':''}">
-        <div class="dia-b" style="background:${c.bg};color:${c.cor};border:1px solid ${c.cor}40;${c.dia==='✅ REATIVAÇÃO'?'font-size:20px;':''}">${c.dia==='✅ REATIVAÇÃO'?'✅':`<span style="font-size:9px;opacity:.8">DIA</span><span style="font-size:14px">${c.dia}</span>`}</div>
-        <div class="ci-info"><div class="ci-tipo" style="color:${c.cor}">${c.tipo}</div><div class="ci-canal">📲 ${c.canal}</div></div>
+  // Agrupar por dia para mostrar separador de dia
+  let lastDia='';
+  document.getElementById('cadlist').innerHTML=CAD.map((c,i)=>{
+    const isSpec=c.dia==='D+10'||c.dia==='REATIVAÇÃO'||c.dia==='D+25'||c.dia==='D+35'||c.dia==='D+20';
+    const isReativ=c.dia==='REATIVAÇÃO';
+    const dayHeader=c.dia!==lastDia?`<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:14px 0 4px;border-top:${lastDia?'1px solid var(--border)':'none'};margin-top:${lastDia?'8px':'0'}">${c.dia==='REATIVAÇÃO'?'':'Dia '} ${c.dia}</div>`:'';
+    lastDia=c.dia;
+    return `${dayHeader}<div class="ci" style="${isReativ?'border-color:#0a4a28':''}">
+      <div class="ch" onclick="tgC(${i})" style="${isReativ?'background:var(--green-bg)':''}">
+        <div class="dia-b" style="background:${c.bg};color:${c.cor};border:1px solid ${c.cor}40;min-width:52px;font-size:11px;text-align:center;padding:4px">
+          ${isReativ?'✅':`<div style="font-size:9px;opacity:.7">${c.turno.split('—')[0].trim()}</div><div style="font-size:10px;font-weight:700">${c.turno.includes('—')?c.turno.split('—')[1].trim():c.dia}</div>`}
+        </div>
+        <div class="ci-info">
+          <div class="ci-tipo" style="color:${c.cor}">${c.tipo}</div>
+          <div class="ci-canal">📲 ${c.canal}</div>
+        </div>
         <div class="chev" id="cv${i}">▼</div>
       </div>
       <div class="cb" id="cb${i}">
         <div class="slbl">💬 Script / Mensagem</div>
         <div class="stxt" style="border-color:${c.cor}60;white-space:pre-wrap">${c.s}</div>
-        <div class="slbl">✅ Ação obrigatória${c.dia==='D+10'||c.dia==='✅ REATIVAÇÃO'?' — CHECKLIST SISTEMA':''}</div>
+        <div class="slbl">✅ Ação obrigatória${isSpec?' — CHECKLIST SISTEMA':''}</div>
         <div class="abox" style="color:${c.cor};border-color:${c.cor}40;background:${c.bg};white-space:pre-wrap;line-height:1.9">${c.acao}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function tgC(i){const b=document.getElementById('cb'+i),cv=document.getElementById('cv'+i);const o=b.classList.toggle('op');cv.classList.toggle('op',o)}
 
