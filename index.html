@@ -563,13 +563,13 @@ function showDetail(idx){
     <div style="background:var(--red-bg);border:1px solid var(--red2);border-radius:var(--r);padding:16px;margin-top:14px">
       <div class="dbt" style="color:var(--red);margin-bottom:12px">CHECKLIST DE SUSPENSAO — ZappyContabil + Acessorias</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        ${['ZappyContabil → adicionar tag <b>SUSPENSO</b>',
-           'ZappyContabil → renomear para: <b>(SUSPENSO) '+c.nome+'</b>',
-           'Acessorias → <b>INATIVAR</b> acesso do cliente',
-           'Painel de clientes suspensos → <b>INCLUIR</b> o cliente',
-           'WhatsApp de suspensao enviado',
-           'Data/hora da suspensao registrada no sistema',
-           'CEO informado'].map((item,ii)=>`
+        ${['ZappyContabil → inserir a tag <b>SUSPENSO</b> no cadastro do cliente',
+           'ZappyContabil → incluir <b>(SUSPENSO FINANCEIRO)</b> na frente do nome: <b>(SUSPENSO FINANCEIRO) '+c.nome+'</b>',
+           'App / Acessorias → <b>SUSPENDER</b> o acesso do cliente',
+           'Sistema de Clientes Suspensos → <b>REGISTRAR</b> a suspensão com data e motivo',
+           'WhatsApp de suspensao enviado ao cliente',
+           'Data/hora da suspensao registrada no sistema financeiro',
+           'CEO informado imediatamente'].map((item,ii)=>`
           <div style="display:flex;align-items:flex-start;gap:10px;cursor:pointer" onclick="tgSusChk(this)">
             <div style="min-width:18px;height:18px;border:2px solid var(--red2);border-radius:4px;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0;transition:all .15s" class="sus-box"></div>
             <span style="font-size:13px;color:var(--text2);line-height:1.4">${ii+1}. ${item}</span>
@@ -579,9 +579,9 @@ function showDetail(idx){
     <div style="background:var(--green-bg);border:1px solid #0a4a28;border-radius:var(--r);padding:16px;margin-top:10px">
       <div class="dbt" style="color:var(--green);margin-bottom:12px">CHECKLIST DE REATIVACAO — apos pagamento confirmado</div>
       <div style="display:flex;flex-direction:column;gap:7px">
-        ${['Confirmar pagamento integral ou acordo formalizado',
-           'ZappyContabil → <b>REMOVER</b> tag SUSPENSO',
-           'ZappyContabil → restaurar nome original: <b>'+c.nome+'</b>',
+        ${['Confirmar pagamento integral ou acordo formalizado por escrito',
+           'ZappyContabil → <b>REMOVER</b> a tag SUSPENSO do cadastro',
+           'ZappyContabil → retirar "(SUSPENSO FINANCEIRO)" — restaurar nome: <b>'+c.nome+'</b>',
            'Acessorias → <b>REATIVAR</b> acesso do cliente',
            'Painel de clientes suspensos → <b>REMOVER</b> o cliente',
            'Data/hora da reativacao registrada no sistema',
@@ -928,10 +928,10 @@ Entre em contato AGORA, mesmo para propor um acordo.
   // D+10 SUSPENSÃO
   {dia:'D+10',turno:'☀️ 08h — EXECUTAR',tipo:'🔴 SUSPENSÃO TOTAL',canal:'WhatsApp + Equipe Interna',cor:'#fff',bg:'#7f1d1d',
    acao:`CHECKLIST — executar às 08h:
-① ZappyContábil → adicionar tag SUSPENSO
-② ZappyContábil → renomear: (SUSPENSO) [NOME DO CLIENTE]
-③ Acessórias → INATIVAR acesso
-④ Painel de suspensos → INCLUIR
+① ZappyContábil → inserir a tag SUSPENSO no cadastro do cliente
+② ZappyContábil → incluir (SUSPENSO FINANCEIRO) na frente do nome do cliente
+③ App / Acessórias → SUSPENDER o acesso do cliente
+④ Sistema de Clientes Suspensos → REGISTRAR a suspensão com data e motivo
 ⑤ Enviar WhatsApp de suspensão
 ⑥ Registrar data/hora no sistema
 ⑦ INFORMAR CEO imediatamente`,
@@ -1101,9 +1101,9 @@ Para cancelamento do protesto e reativação dos serviços: quitação integral 
   // REATIVAÇÃO
   {dia:'REATIVAÇÃO',turno:'Após pagamento confirmado',tipo:'Procedimento de Reativação',canal:'Interno + WhatsApp',cor:'#10b981',bg:'#08201a',
    acao:`CHECKLIST DE REATIVAÇÃO:
-① Confirmar pagamento integral ou acordo formalizado
-② ZappyContábil → REMOVER tag SUSPENSO
-③ ZappyContábil → restaurar nome original
+① Confirmar pagamento integral ou acordo formalizado por escrito
+② ZappyContábil → REMOVER a tag SUSPENSO do cadastro
+③ ZappyContábil → retirar (SUSPENSO FINANCEIRO) e restaurar o nome original
 ④ Acessórias → REATIVAR acesso
 ⑤ Painel de suspensos → REMOVER
 ⑥ Registrar data/hora da reativação
